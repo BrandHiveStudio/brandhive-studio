@@ -12,7 +12,7 @@ import Text from "@/components/typography/Text";
 import Badge from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/cards/Card";
-import { fallbackArticles, type PublicPost } from "@/lib/db/queries/posts";
+import { fallbackArticles, type PublicPost } from "@/data/articles";
 
 interface InsightsClientProps {
   initialPosts?: PublicPost[];

@@ -7,7 +7,7 @@ import { ArrowLeft, Clock, Calendar, Tag, ArrowRight, Sparkles } from "lucide-re
 import Container from "@/components/layout/Container";
 import Heading from "@/components/typography/Heading";
 import Badge from "@/components/ui/Badge";
-import type { PublicPost } from "@/lib/db/queries/posts";
+import type { PublicPost } from "@/data/articles";
 
 interface ArticleClientProps {
   article: PublicPost;

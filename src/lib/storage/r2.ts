@@ -8,14 +8,8 @@ import {
   type ListObjectsV2CommandOutput,
 } from "@aws-sdk/client-s3";
 
-import * as dotenv from "dotenv";
-
 if (typeof window !== "undefined") {
   throw new Error("R2 storage module cannot be imported in client-side code.");
-}
-
-if (!process.env.R2_ENDPOINT) {
-  dotenv.config({ path: ".env.local" });
 }
 
 function getR2Config() {

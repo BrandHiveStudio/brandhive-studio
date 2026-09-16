@@ -7,7 +7,7 @@ import Heading from "@/components/typography/Heading";
 import Text from "@/components/typography/Text";
 import Badge from "@/components/ui/Badge";
 import { ChevronDown } from "lucide-react";
-import { fallbackFaqs, type PublicFaq } from "@/lib/db/queries/faqs";
+import { fallbackFaqs, type PublicFaq } from "@/data/faqs";
 
 interface FaqProps {
   initialFaqs?: PublicFaq[];
