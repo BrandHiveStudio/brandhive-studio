@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ServicesClient from "./ServicesClient";
+import { getPublishedServices } from "@/lib/db/queries/services";
 
 export const metadata: Metadata = {
   title: "Our Services | BrandHive Studio",
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default function Page() {
-  return <ServicesClient />;
+export default async function Page() {
+  const dynamicServices = await getPublishedServices();
+  return <ServicesClient initialServices={dynamicServices} />;
 }

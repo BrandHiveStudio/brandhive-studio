@@ -15,6 +15,7 @@ import { Card } from "@/components/cards/Card";
 export default function ContactClient() {
   const [formData, setFormData] = useState({ name: "", email: "", service: "Brand Identity", message: "" });
   const [errors, setErrors] = useState({ name: "", email: "", message: "" });
+  const [serverError, setServerError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -42,43 +43,46 @@ export default function ContactClient() {
     return valid;
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError("");
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  try {
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.message);
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to submit inquiry.");
+      }
+
+      setIsSubmitted(true);
+
+      setFormData({
+        name: "",
+        email: "",
+        service: "Brand Identity",
+        message: "",
+      });
+    } catch (error) {
+      console.error(error);
+      setServerError(
+        error instanceof Error ? error.message : "Failed to send inquiry. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitted(true);
-
-    setFormData({
-      name: "",
-      email: "",
-      service: "Brand Identity",
-      message: "",
-    });
-  } catch (error) {
-    console.error(error);
-    alert("Failed to send inquiry. Please try again.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
   const containerVariants = {
     hidden: {},
     visible: {
@@ -417,7 +421,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                           {/* Actions Area */}
                           <div className="flex flex-col gap-4 mt-2">
-                            
+                            {serverError && (
+                              <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/25 text-red-400 text-xs font-medium text-center animate-in fade-in">
+                                {serverError}
+                              </div>
+                            )}
+
                             {/* Submit Button */}
                             <motion.div
                               whileHover={{

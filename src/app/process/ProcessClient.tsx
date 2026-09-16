@@ -59,7 +59,25 @@ const processStages = [
   },
 ];
 
-export default function ProcessClient() {
+import type { PublicProcessStep } from "@/lib/db/queries/process";
+
+interface ProcessClientProps {
+  initialSteps?: PublicProcessStep[];
+}
+
+export default function ProcessClient({ initialSteps }: ProcessClientProps) {
+  const stages = (initialSteps && initialSteps.length > 0)
+    ? initialSteps.map((s, idx) => ({
+        step: s.stepNumber,
+        badge: s.badge || "WORKFLOW",
+        title: s.title,
+        description: s.description,
+        image: s.imageUrl || "/images/process/discovery/process-discovery-workshop.webp",
+        bullets: s.deliverables && s.deliverables.length > 0 ? s.deliverables : [],
+        isReversed: idx % 2 === 1,
+      }))
+    : processStages;
+
   return (
     <main className="min-h-screen bg-transparent pt-32 pb-16 relative">
       {/* Volumetric Lights */}
@@ -92,7 +110,7 @@ export default function ProcessClient() {
       <HeroDivider />
 
       {/* 2. Process Timeline Blocks */}
-      {processStages.map((stage, idx) => (
+      {stages.map((stage, idx) => (
         <Section
           key={idx}
           className="py-16 lg:py-24 border-t border-white/5 bg-transparent"

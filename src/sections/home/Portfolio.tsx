@@ -2,9 +2,10 @@
 
 import type { StaticImageData } from "next/image";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import type { PublicProject } from "@/lib/db/queries/projects";
 import uzeeTechCover from "../../../public/images/portfolio/covers/portfolio-uzee-tech-cover.png";
 import uzeeTechLogo from "../../../public/images/portfolio/UZEE TECH/01 Logo/logo-icon.png";
 import qdxExpressCover from "../../../public/images/portfolio/covers/portfolio-qdx-express-cover.png";
@@ -85,8 +86,31 @@ const imageRevealVariant: Variants = {
   },
 };
 
-export default function Portfolio() {
+interface PortfolioProps {
+  initialProjects?: PublicProject[];
+}
+
+export default function Portfolio({ initialProjects }: PortfolioProps = {}) {
   const shouldReduceMotion = useReducedMotion();
+
+  const displayedProjects = useMemo(() => {
+    if (initialProjects && initialProjects.length > 0) {
+      return initialProjects.slice(0, 6).map((p) => ({
+        title: p.title,
+        category: p.category,
+        image: p.cover,
+        logo: p.logo,
+        description: p.shortDescription || p.description,
+        href: `/portfolio/${p.slug}`,
+        client: p.client,
+        industry: p.category,
+        services: p.badges && p.badges.length > 0 ? p.badges.slice(0, 2).join(", ") : p.category,
+        year: p.year,
+        isOngoing: p.isOngoing,
+      }));
+    }
+    return projects;
+  }, [initialProjects]);
 
   const cardVariants: Variants = {
     hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40, filter: "blur(6px)" },
@@ -156,7 +180,7 @@ export default function Portfolio() {
           viewport={{ once: true, margin: "-80px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8"
         >
-          {projects.map((project, index) => (
+          {displayedProjects.map((project, index) => (
             <motion.div key={index} variants={cardVariants} style={{ willChange: "transform, opacity" }} className="h-full">
               <Link href={project.href} className="group block h-full focus-visible:outline-none" data-cursor-label="VIEW CASE STUDY">
                 {/* 3D tilt and lighting sweep showcase card */}

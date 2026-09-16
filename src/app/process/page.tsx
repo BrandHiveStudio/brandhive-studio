@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import ProcessClient from "./ProcessClient";
 
+import { getPublishedProcessSteps } from "@/lib/db/queries/process";
+
 export const metadata: Metadata = {
   title: "Our Process | BrandHive Studio",
   description: "Learn more about our systematic branding, design, and development process. From initial discovery to deployment, we engineer visually premium and fast web products.",
@@ -28,6 +30,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default function Page() {
-  return <ProcessClient />;
+export default async function Page() {
+  const dynamicSteps = await getPublishedProcessSteps();
+  return <ProcessClient initialSteps={dynamicSteps} />;
 }

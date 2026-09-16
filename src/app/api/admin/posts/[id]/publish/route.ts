@@ -1,0 +1,30 @@
+import { NextResponse } from "next/server";
+import { getCurrentAdmin } from "@/lib/auth/session";
+import { togglePostPublish } from "@/lib/db/queries/posts";
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const updated = await togglePostPublish(id);
+
+    if (!updated) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      post: updated,
+    });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to toggle post publish status";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}

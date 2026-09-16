@@ -83,7 +83,59 @@ const cardVariants: Variants = {
   },
 };
 
-export default function Process() {
+import type { PublicProcessStep } from "@/lib/db/queries/process";
+
+function getStepIconNode(iconName: string, fallbackIdx: number) {
+  switch (iconName?.toLowerCase()) {
+    case "strategy":
+      return (
+        <svg className="size-5 text-[#16C7FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      );
+    case "design":
+      return (
+        <svg className="size-5 text-[#16C7FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+        </svg>
+      );
+    case "code":
+      return (
+        <svg className="size-5 text-[#16C7FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      );
+    case "launch":
+      return (
+        <svg className="size-5 text-[#16C7FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      );
+    case "search":
+    default:
+      if (steps[fallbackIdx]?.icon) return steps[fallbackIdx].icon;
+      return (
+        <svg className="size-5 text-[#16C7FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      );
+  }
+}
+
+interface ProcessProps {
+  initialSteps?: PublicProcessStep[];
+}
+
+export default function Process({ initialSteps }: ProcessProps) {
+  const renderedSteps = (initialSteps && initialSteps.length > 0)
+    ? initialSteps.map((s, idx) => ({
+        step: s.stepNumber,
+        title: s.shortTitle || s.title,
+        description: s.shortDescription || s.description.slice(0, 70),
+        icon: getStepIconNode(s.icon, idx),
+      }))
+    : steps;
+
   const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -134,7 +186,7 @@ export default function Process() {
             viewport={{ once: true, margin: "-50px" }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12 sm:gap-8 relative z-10"
           >
-            {steps.map((step) => (
+            {renderedSteps.map((step) => (
               <motion.div
                 key={step.step}
                 variants={cardVariants}

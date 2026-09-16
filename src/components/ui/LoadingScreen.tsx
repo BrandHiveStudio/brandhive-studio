@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 export default function LoadingScreen() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -31,6 +33,10 @@ export default function LoadingScreen() {
       setIsVisible(false);
     }
   }, [prefersReducedMotion]);
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   if (!isVisible || prefersReducedMotion) return null;
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { HTMLAttributes, ElementType, useState, useEffect } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";

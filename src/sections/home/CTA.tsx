@@ -25,7 +25,11 @@ const itemVariants: Variants = {
   },
 };
 
-export default function CTA() {
+interface CTAProps {
+  contentMap?: Record<string, string>;
+}
+
+export default function CTA({ contentMap }: CTAProps = {}) {
   return (
     <div id="cta">
       <Section className="relative overflow-hidden pt-12 pb-24 lg:pt-16 lg:pb-32 bg-transparent">
@@ -61,19 +65,19 @@ export default function CTA() {
                     variant="secondary"
                     className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF]"
                   >
-                    READY TO START?
+                    {contentMap?.["cta_badge"] || "READY TO START?"}
                   </Badge>
                 </motion.div>
 
                 <motion.div variants={itemVariants}>
                   <Heading level="h2" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white border-none pb-0 leading-tight">
-                    Let&apos;s Build Something Extraordinary.
+                    {contentMap?.["cta_heading"] || "Let's Build Something Extraordinary."}
                   </Heading>
                 </motion.div>
 
                 <motion.div variants={itemVariants}>
                   <Text className="max-w-2xl text-white/75 text-base sm:text-lg leading-relaxed">
-                    Whether you&apos;re launching a new business, refreshing your brand, or creating a premium digital experience, BrandHive Studio is ready to bring your vision to life.
+                    {contentMap?.["cta_description"] || "Whether you're launching a new business, refreshing your brand, or creating a premium digital experience, BrandHive Studio is ready to bring your vision to life."}
                   </Text>
                 </motion.div>
               </div>
@@ -97,7 +101,7 @@ export default function CTA() {
                         className="cta-sweep-auto w-full rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-6 shadow-[0_0_20px_rgba(22,199,255,0.2)] hover:from-[#60D6FF] hover:to-[#16C7FF] transition-all duration-300 text-center cursor-pointer"
                         aria-label="Start a Project with BrandHive Studio"
                       >
-                        Start a Project
+                        {contentMap?.["cta_button_text"] || "Start a Project"}
                       </Button>
                     </Link>
                   </motion.div>

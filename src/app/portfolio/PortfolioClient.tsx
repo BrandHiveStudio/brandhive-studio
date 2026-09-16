@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import uzeeTechCover from "../../../public/images/portfolio/covers/portfolio-uzee-tech-cover.png";
 import uzeeTechLogo from "../../../public/images/portfolio/UZEE TECH/01 Logo/logo-icon.png";
 import qdxExpressCover from "../../../public/images/portfolio/covers/portfolio-qdx-express-cover.png";
@@ -231,9 +231,24 @@ const cardVariants: Variants = {
   },
 };
 
-export default function PortfolioClient() {
-  const featuredProject = projects.find(p => p.isFeatured);
-  const otherProjects = projects.filter(p => !p.isFeatured);
+interface PortfolioClientProps {
+  initialProjects?: Array<{
+    slug: string;
+    title: string;
+    category: string;
+    cover: StaticImageData | string;
+    logo: StaticImageData | string;
+    shortDescription: string;
+    badges: string[];
+    isFeatured?: boolean;
+    isOngoing?: boolean;
+  }>;
+}
+
+export default function PortfolioClient({ initialProjects }: PortfolioClientProps = {}) {
+  const displayProjects = initialProjects && initialProjects.length > 0 ? initialProjects : projects;
+  const featuredProject = displayProjects.find(p => p.isFeatured) || displayProjects[0];
+  const otherProjects = displayProjects.filter(p => p.slug !== featuredProject?.slug);
 
   return (
     <main className="min-h-screen bg-transparent pt-28 pb-12 relative">

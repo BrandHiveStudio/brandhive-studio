@@ -9,6 +9,7 @@ import ScrollProvider from "@/components/providers/ScrollProvider";
 import PageTransitionProvider from "@/components/providers/PageTransitionProvider";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface ClientOverlaysProps {
@@ -16,6 +17,7 @@ interface ClientOverlaysProps {
 }
 
 export default function ClientOverlays({ children }: ClientOverlaysProps) {
+  const pathname = usePathname();
   const [isHeavyEnabled, setIsHeavyEnabled] = useState(true);
 
   useEffect(() => {
@@ -25,6 +27,10 @@ export default function ClientOverlays({ children }: ClientOverlaysProps) {
       setIsHeavyEnabled(false);
     }
   }, []);
+
+  if (pathname?.startsWith("/admin")) {
+    return <>{children}</>;
+  }
 
   return (
     <ScrollProvider>

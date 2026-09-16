@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import HeroDivider from "@/components/ui/HeroDivider";
 import Section from "@/components/layout/Section";
@@ -11,60 +12,28 @@ import Text from "@/components/typography/Text";
 import Badge from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/cards/Card";
+import { fallbackArticles, type PublicPost } from "@/lib/db/queries/posts";
 
-const categories = ["All", "Branding", "Web Design", "Logo Design", "Marketing", "Business Growth"];
+interface InsightsClientProps {
+  initialPosts?: PublicPost[];
+}
 
-const articles = [
-  {
-    title: "Strategic Branding: How Great Brands Build Trust",
-    description: "Learn how successful brands use positioning, identity systems, and consistency to create memorable customer experiences.",
-    image: "/images/services/insights/branding-hero.webp",
-    category: "Branding",
-    date: "July 01, 2026",
-    readTime: "7 MIN READ",
-  },
-  {
-    title: "Modern Website Design That Converts Visitors",
-    description: "Explore the principles behind fast, responsive, user-focused websites that transform visitors into loyal customers.",
-    image: "/images/services/insights/web-design-hero.webp",
-    category: "Web Design",
-    date: "June 25, 2026",
-    readTime: "8 MIN READ",
-  },
-  {
-    title: "Designing Logos That Represent Brands Perfectly",
-    description: "Understand the balance of simplicity, scalability, typography, and symbolism behind memorable logo design.",
-    image: "/images/services/insights/logo-design-hero.webp",
-    category: "Logo Design",
-    date: "June 18, 2026",
-    readTime: "6 MIN READ",
-  },
-  {
-    title: "Performance Marketing Beyond Paid Advertising",
-    description: "Discover how data-driven campaigns, audience research, and creative execution produce measurable business growth.",
-    image: "/images/services/insights/marketing-hero.webp",
-    category: "Marketing",
-    date: "June 10, 2026",
-    readTime: "8 MIN READ",
-  },
-  {
-    title: "Scaling Businesses Through Digital Transformation",
-    description: "See how technology, automation, branding, and strategic planning work together to accelerate sustainable business growth.",
-    image: "/images/services/insights/business-growth-hero.webp",
-    category: "Business Growth",
-    date: "June 02, 2026",
-    readTime: "9 MIN READ",
-  },
-];
+export default function InsightsClient({ initialPosts }: InsightsClientProps) {
+  const allArticles = initialPosts && initialPosts.length > 0 ? initialPosts : fallbackArticles;
 
-export default function InsightsClient() {
+  const featuredArticle = allArticles.find((a) => a.isFeatured) || allArticles[0];
+  const gridArticles = allArticles.filter((a) => a.id !== featuredArticle?.id);
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredArticles = articles.filter((post) => {
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          post.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const categories = ["All", ...Array.from(new Set(allArticles.map((a) => a.category)))];
+
+  const filteredArticles = gridArticles.filter((post) => {
+    const matchesCategory = selectedCategory === "All" || post.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -75,7 +44,7 @@ export default function InsightsClient() {
         <div className="absolute top-[15%] right-[10%] w-[380px] h-[380px] rounded-full bg-[#16C7FF]/4 blur-[110px]" />
         <div className="absolute top-[60%] left-[5%] w-[320px] h-[320px] rounded-full bg-blue-500/3 blur-[95px]" />
       </div>
-      
+
       {/* 1. Hero Section */}
       <Section className="relative overflow-hidden pb-8 lg:pb-12 bg-transparent">
         <Container>
@@ -88,7 +57,9 @@ export default function InsightsClient() {
             </Badge>
             <Heading level="h1" className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white border-none pb-0">
               Perspectives on <br />
-              <span className="text-[#16C7FF] bg-clip-text bg-gradient-to-r from-[#16C7FF] to-blue-500">Design & Technology.</span>
+              <span className="text-[#16C7FF] bg-clip-text bg-gradient-to-r from-[#16C7FF] to-blue-500">
+                Design &amp; Technology.
+              </span>
             </Heading>
             <Text className="text-white/70 text-lg sm:text-xl leading-relaxed max-w-3xl font-normal">
               Discover expert insights, practical strategies, and real-world perspectives on branding, web design, digital marketing, business growth, and modern technology—crafted to help ambitious businesses make better digital decisions.
@@ -100,45 +71,45 @@ export default function InsightsClient() {
       <HeroDivider />
 
       {/* 2. Featured Article Spot */}
-      {(selectedCategory === "All" || selectedCategory === "Branding") && (
+      {featuredArticle && (selectedCategory === "All" || featuredArticle.category.toLowerCase() === selectedCategory.toLowerCase()) && (
         <Section className="py-8 bg-transparent">
           <Container>
-            <div className="relative w-full rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 bg-[#11161C]/55 overflow-hidden shadow-2xl hover:border-[#16C7FF]/20 transition-all duration-300">
-              <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12">
-                
-                {/* Image Column */}
-                <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-video w-full bg-neutral-900 overflow-hidden">
-                  <Image
-                    src="/images/services/insights/service-visual-identity-system.webp"
-                    alt="Featured Article - Building Brands That Stand the Test of Time"
-                    fill
-                    className="object-cover opacity-90 transition-opacity duration-300 hover:opacity-100"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                  />
-                </div>
-
-                {/* Details Column */}
-                <div className="lg:col-span-5 p-8 sm:p-10 flex flex-col gap-5">
-                  <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-[#16C7FF]">
-                    <span>FEATURED ARTICLE</span>
-                    <span className="size-1 rounded-full bg-white/10" />
-                    <span>BRANDING</span>
+            <Link href={`/insights/${featuredArticle.slug}`} className="block group">
+              <div className="relative w-full rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 bg-[#11161C]/55 overflow-hidden shadow-2xl hover:border-[#16C7FF]/30 transition-all duration-300">
+                <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12">
+                  {/* Image Column */}
+                  <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-video w-full bg-neutral-900 overflow-hidden">
+                    <Image
+                      src={featuredArticle.image}
+                      alt={featuredArticle.title}
+                      fill
+                      className="object-cover opacity-90 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                    />
                   </div>
-                  <Heading level="h2" className="text-2xl sm:text-3xl font-extrabold text-white border-none pb-0 leading-tight">
-                    Building Brands That Stand the Test of Time
-                  </Heading>
-                  <Text className="text-sm sm:text-base text-white/70 leading-relaxed font-normal">
-                    Discover how strategic branding, visual identity systems, and consistent customer experiences help businesses establish trust, increase recognition, and create long-term competitive advantages.
-                  </Text>
-                  <div className="flex items-center justify-between text-xs font-bold text-white/50 mt-2">
-                    <span>July 12, 2026</span>
-                    <span>10 MIN READ</span>
+
+                  {/* Details Column */}
+                  <div className="lg:col-span-5 p-8 sm:p-10 flex flex-col gap-5">
+                    <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-[#16C7FF]">
+                      <span>FEATURED ARTICLE</span>
+                      <span className="size-1 rounded-full bg-white/10" />
+                      <span>{featuredArticle.category}</span>
+                    </div>
+                    <Heading level="h2" className="text-2xl sm:text-3xl font-extrabold text-white border-none pb-0 leading-tight group-hover:text-[#16C7FF] transition-colors">
+                      {featuredArticle.title}
+                    </Heading>
+                    <Text className="text-sm sm:text-base text-white/70 leading-relaxed font-normal">
+                      {featuredArticle.description}
+                    </Text>
+                    <div className="flex items-center justify-between text-xs font-bold text-white/50 mt-2">
+                      <span>{featuredArticle.date}</span>
+                      <span>{featuredArticle.readTime}</span>
+                    </div>
                   </div>
                 </div>
-
               </div>
-            </div>
+            </Link>
           </Container>
         </Section>
       )}
@@ -154,7 +125,7 @@ export default function InsightsClient() {
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-4.5 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
-                    selectedCategory === cat
+                    selectedCategory.toLowerCase() === cat.toLowerCase()
                       ? "bg-gradient-to-r from-[#16C7FF] to-[#0096C7] border-none text-[#050608] shadow-[0_0_15px_rgba(22,199,255,0.25)]"
                       : "bg-[#11161C]/50 border-white/10 text-white/60 hover:border-[#16C7FF]/30 hover:text-white"
                   }`}
@@ -164,7 +135,7 @@ export default function InsightsClient() {
               ))}
             </div>
 
-            {/* Simple search box */}
+            {/* Search box */}
             <div className="relative w-full md:max-w-xs shrink-0">
               <input
                 type="text"
@@ -188,52 +159,54 @@ export default function InsightsClient() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredArticles.map((post, index) => (
+              {filteredArticles.map((post) => (
                 <motion.div
-                  key={index}
+                  key={post.id || post.slug}
                   whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 150, damping: 15 }}
                   className="h-full"
                 >
-                  <Card className="flex flex-col h-full overflow-hidden p-0 rounded-[2rem] border border-white/10 bg-[#11161C]/55 backdrop-blur-md shadow-lg hover:border-[#16C7FF]/20 hover:shadow-[0_15px_30px_rgba(22,199,255,0.04)] transition-all duration-300">
-                    {/* Cover image */}
-                    <div className="relative w-full aspect-[16/10] overflow-hidden bg-neutral-900">
-                      <Image
-                        src={post.image}
-                        alt={post.title}
-                        fill
-                        className="object-cover opacity-90 transition-opacity duration-300 hover:opacity-100"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    </div>
-
-                    {/* Metadata Header */}
-                    <CardHeader className="p-8 pb-3">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Badge
-                          variant="secondary"
-                          className="px-2.5 py-0.5 text-[9px] font-bold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF]"
-                        >
-                          {post.category}
-                        </Badge>
+                  <Link href={`/insights/${post.slug}`} className="block h-full group">
+                    <Card className="flex flex-col h-full overflow-hidden p-0 rounded-[2rem] border border-white/10 bg-[#11161C]/55 backdrop-blur-md shadow-lg hover:border-[#16C7FF]/30 hover:shadow-[0_15px_30px_rgba(22,199,255,0.06)] transition-all duration-300">
+                      {/* Cover image */}
+                      <div className="relative w-full aspect-[16/10] overflow-hidden bg-neutral-900">
+                        <Image
+                          src={post.image}
+                          alt={post.title}
+                          fill
+                          className="object-cover opacity-90 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
                       </div>
-                      <CardTitle className="text-lg font-extrabold text-white leading-tight">
-                        {post.title}
-                      </CardTitle>
-                    </CardHeader>
 
-                    {/* Content Body */}
-                    <CardContent className="p-8 pt-0 flex-grow flex flex-col justify-between gap-6">
-                      <CardDescription className="text-sm text-white/60 leading-relaxed font-normal">
-                        {post.description}
-                      </CardDescription>
-                      
-                      <div className="flex items-center justify-between text-[10px] font-bold text-white/40 uppercase tracking-wider pt-4 border-t border-white/5">
-                        <span>{post.date}</span>
-                        <span>{post.readTime}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      {/* Metadata Header */}
+                      <CardHeader className="p-8 pb-3">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge
+                            variant="secondary"
+                            className="px-2.5 py-0.5 text-[9px] font-bold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF]"
+                          >
+                            {post.category}
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-lg font-extrabold text-white leading-tight group-hover:text-[#16C7FF] transition-colors">
+                          {post.title}
+                        </CardTitle>
+                      </CardHeader>
+
+                      {/* Content Body */}
+                      <CardContent className="p-8 pt-0 flex-grow flex flex-col justify-between gap-6">
+                        <CardDescription className="text-sm text-white/60 leading-relaxed font-normal line-clamp-3">
+                          {post.description}
+                        </CardDescription>
+
+                        <div className="flex items-center justify-between text-[10px] font-bold text-white/40 uppercase tracking-wider pt-4 border-t border-white/5">
+                          <span>{post.date}</span>
+                          <span>{post.readTime}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -248,7 +221,7 @@ export default function InsightsClient() {
             <div className="absolute inset-0 blueprint-grid opacity-[0.25] pointer-events-none" />
             <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-[#16C7FF]/15 blur-[90px] pointer-events-none animate-pulse" style={{ animationDuration: "6s" }} />
             <div className="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-[#16C7FF]/15 blur-[90px] pointer-events-none animate-pulse" style={{ animationDuration: "7s" }} />
-            
+
             <div className="relative flex flex-col items-center text-center gap-6 max-w-2xl mx-auto z-10">
               <Badge
                 variant="secondary"
@@ -262,7 +235,7 @@ export default function InsightsClient() {
               <Text className="text-white/70 text-sm sm:text-base leading-relaxed font-normal">
                 Receive exclusive insights, practical design strategies, digital marketing trends, and business growth ideas delivered directly to your inbox.
               </Text>
-              
+
               {/* Form Input */}
               <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row gap-3 w-full max-w-md mt-2">
                 <input
@@ -284,7 +257,6 @@ export default function InsightsClient() {
           </div>
         </Container>
       </Section>
-
     </main>
   );
 }

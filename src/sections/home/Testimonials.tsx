@@ -1,48 +1,65 @@
 "use client";
 
+import Image from "next/image";
 import { motion, Variants, useReducedMotion } from "framer-motion";
 import Section from "@/components/layout/Section";
 import Heading from "@/components/typography/Heading";
 import Text from "@/components/typography/Text";
 import Badge from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader } from "@/components/cards/Card";
+import type { PublicTestimonial } from "@/lib/db/queries/testimonials";
 
-const testimonials = [
+interface FallbackTestimonial {
+  client: string;
+  company: string;
+  role: string;
+  review: string;
+  logo?: React.ReactNode;
+  logoUrl?: string | null;
+}
+
+const fallbackLogos: Record<string, React.ReactNode> = {
+  "uzee tech": (
+    <svg className="w-20 h-6 text-white/80" viewBox="0 0 120 32" fill="currentColor">
+      <path d="M10 8h4v12h-4V8zm2 14a1 1 0 110-2 1 1 0 010 2zM20 8h8a4 4 0 010 8h-4v4h-4V8zm4 4h4a1.5 1.5 0 100-3h-4v3zM34 8h10v4H38v3h5v4h-5v5h6v4H34V8zm16 0h10v4H54v3h5v4h-5v5h6v4H50V8zm16 0h10v4H54v3h5v4h-5v5h6v4H50V8z" fill="#16C7FF" />
+      <text x="65" y="21" fontFamily="sans-serif" fontSize="10" fontWeight="bold" letterSpacing="1">TECH</text>
+    </svg>
+  ),
+  "leo villas": (
+    <svg className="w-20 h-6 text-white/80" viewBox="0 0 120 32" fill="currentColor">
+      <path d="M12 6l-8 6h4v14h8V12h4l-8-6z" fill="#16C7FF" />
+      <text x="32" y="22" fontFamily="serif" fontSize="13" fontWeight="bold" letterSpacing="0.5">LEO VILLAS</text>
+    </svg>
+  ),
+  "seya beauty studio": (
+    <svg className="w-24 h-6 text-white/80" viewBox="0 0 150 32" fill="currentColor">
+      <path d="M12 6c-3 3-5 7-5 10s2 7 5 10c3-3 5-7 5-10s-2-7-5-10z" fill="#16C7FF" opacity="0.8" />
+      <text x="30" y="21" fontFamily="sans-serif" fontSize="10" fontWeight="normal" letterSpacing="1">SEYA BEAUTY</text>
+    </svg>
+  ),
+};
+
+const defaultTestimonials: FallbackTestimonial[] = [
   {
     client: "Umar Farook",
     company: "UZEE TECH",
     role: "Founder",
     review: "BrandHive Studio completely transformed our brand. Their creativity, professionalism and attention to detail are unmatched.",
-    logo: (
-      <svg className="w-20 h-6 text-white/80" viewBox="0 0 120 32" fill="currentColor">
-        <path d="M10 8h4v12h-4V8zm2 14a1 1 0 110-2 1 1 0 010 2zM20 8h8a4 4 0 010 8h-4v4h-4V8zm4 4h4a1.5 1.5 0 100-3h-4v3zM34 8h10v4H38v3h5v4h-5v5h6v4H34V8zm16 0h10v4H54v3h5v4h-5v5h6v4H50V8zm16 0h10v4H54v3h5v4h-5v5h6v4H50V8z" fill="#16C7FF" />
-        <text x="65" y="21" fontFamily="sans-serif" fontSize="10" fontWeight="bold" letterSpacing="1">TECH</text>
-      </svg>
-    ),
+    logo: fallbackLogos["uzee tech"],
   },
   {
     client: "Ajay Kumar",
     company: "Leo Villas",
     role: "Owner",
     review: "They understood our vision perfectly and delivered a brand identity that truly represents who we are.",
-    logo: (
-      <svg className="w-20 h-6 text-white/80" viewBox="0 0 120 32" fill="currentColor">
-        <path d="M12 6l-8 6h4v14h8V12h4l-8-6z" fill="#16C7FF" />
-        <text x="32" y="22" fontFamily="serif" fontSize="13" fontWeight="bold" letterSpacing="0.5">LEO VILLAS</text>
-      </svg>
-    ),
+    logo: fallbackLogos["leo villas"],
   },
   {
     client: "Natasha Silva",
     company: "Seya Beauty Studio",
     role: "Founder",
     review: "Amazing team, great communication and outstanding results. Highly recommended!",
-    logo: (
-      <svg className="w-24 h-6 text-white/80" viewBox="0 0 150 32" fill="currentColor">
-        <path d="M12 6c-3 3-5 7-5 10s2 7 5 10c3-3 5-7 5-10s-2-7-5-10z" fill="#16C7FF" opacity="0.8" />
-        <text x="30" y="21" fontFamily="sans-serif" fontSize="10" fontWeight="normal" letterSpacing="1">SEYA BEAUTY</text>
-      </svg>
-    ),
+    logo: fallbackLogos["seya beauty studio"],
   },
 ];
 
@@ -56,7 +73,11 @@ const containerVariants: Variants = {
   },
 };
 
-export default function Testimonials() {
+interface TestimonialsProps {
+  initialTestimonials?: PublicTestimonial[];
+}
+
+export default function Testimonials({ initialTestimonials }: TestimonialsProps) {
   const shouldReduceMotion = useReducedMotion();
 
   const cardVariants: Variants = {
@@ -71,6 +92,18 @@ export default function Testimonials() {
       },
     },
   };
+
+  const displayList = (initialTestimonials && initialTestimonials.length > 0)
+    ? initialTestimonials.map((t) => ({
+        id: t.id,
+        client: t.client,
+        company: t.company,
+        role: t.role,
+        review: t.review,
+        logoUrl: t.logoUrl,
+        logo: fallbackLogos[t.company.trim().toLowerCase()] || null,
+      }))
+    : defaultTestimonials;
 
   return (
     <div id="testimonials">
@@ -109,7 +142,7 @@ export default function Testimonials() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8"
         >
-          {testimonials.map((t, index) => (
+          {displayList.map((t, index) => (
             <motion.div
               key={index}
               variants={cardVariants}
@@ -140,8 +173,22 @@ export default function Testimonials() {
                       {t.role}, {t.company}
                     </span>
                   </div>
-                  <div className="shrink-0 max-w-[80px]">
-                    {t.logo}
+                  <div className="shrink-0 max-w-[80px] flex items-center justify-end">
+                    {t.logoUrl ? (
+                      <Image
+                        src={t.logoUrl}
+                        alt={t.company}
+                        width={80}
+                        height={28}
+                        className="object-contain max-h-7 max-w-[80px] brightness-90 opacity-80"
+                      />
+                    ) : t.logo ? (
+                      t.logo
+                    ) : (
+                      <span className="text-[10px] font-semibold text-white/40 tracking-wider uppercase font-mono">
+                        {t.company}
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -1,9 +1,11 @@
 import { MetadataRoute } from "next";
+import { getPublishedProjects } from "@/lib/db/queries/projects";
+import { getPublishedPosts } from "@/lib/db/queries/posts";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://brandhivestudio.com.lk";
 
-  // Static routes
+  // Static core routes
   const routes = [
     "",
     "/about",
@@ -14,8 +16,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/contact",
   ];
 
-  // Dynamic portfolio slugs
-  const portfolioSlugs = [
+  // Baseline fallback portfolio slugs
+  const defaultPortfolioSlugs = [
     "uzee-tech",
     "qdx-express",
     "ruhunu-spice-food",
@@ -34,19 +36,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "blossom-task",
   ];
 
-  const staticUrls = routes.map((route) => ({
+  const staticUrls: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: route === "" ? 1.0 : 0.8,
   }));
 
-  const dynamicUrls = portfolioSlugs.map((slug) => ({
-    url: `${baseUrl}/portfolio/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
+  // Fetch dynamic published projects
+  let dynamicPortfolioUrls: MetadataRoute.Sitemap = [];
+  try {
+    const pubProjects = await getPublishedProjects();
+    const slugs = pubProjects.length > 0 ? pubProjects.map((p) => p.slug) : defaultPortfolioSlugs;
+    dynamicPortfolioUrls = slugs.map((slug) => ({
+      url: `${baseUrl}/portfolio/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    dynamicPortfolioUrls = defaultPortfolioSlugs.map((slug) => ({
+      url: `${baseUrl}/portfolio/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+  }
 
-  return [...staticUrls, ...dynamicUrls];
+  // Fetch dynamic published posts
+  let dynamicPostUrls: MetadataRoute.Sitemap = [];
+  try {
+    const pubPosts = await getPublishedPosts();
+    dynamicPostUrls = pubPosts.map((post) => ({
+      url: `${baseUrl}/insights/${post.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    dynamicPostUrls = [];
+  }
+
+  return [...staticUrls, ...dynamicPortfolioUrls, ...dynamicPostUrls];
 }

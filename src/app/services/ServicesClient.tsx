@@ -71,7 +71,31 @@ const serviceSections = [
   }
 ];
 
-export default function ServicesClient() {
+interface ServiceItemProp {
+  badge: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  features: string[];
+}
+
+interface ServicesClientProps {
+  initialServices?: ServiceItemProp[];
+}
+
+export default function ServicesClient({ initialServices }: ServicesClientProps = {}) {
+  const displayServices =
+    initialServices && initialServices.length > 0
+      ? initialServices.map((s, idx) => ({
+          badge: s.badge || "OUR EXPERTISE",
+          title: s.title,
+          description: s.description,
+          image: s.imageUrl || "/images/services/branding/service-brand-strategy-workshop.webp",
+          features: s.features || [],
+          isReversed: idx % 2 === 1,
+        }))
+      : serviceSections;
+
   return (
     <main className="min-h-screen bg-transparent pt-32 pb-16 relative">
       {/* Volumetric Lights */}
@@ -104,7 +128,7 @@ export default function ServicesClient() {
       <HeroDivider />
 
       {/* 2. Detailed Service Blocks */}
-      {serviceSections.map((sec, idx) => (
+      {displayServices.map((sec, idx) => (
         <Section
           key={idx}
           className="py-16 lg:py-24 border-t border-white/5 bg-transparent"

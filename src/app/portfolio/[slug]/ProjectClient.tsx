@@ -13,7 +13,7 @@ import Badge from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
-interface Project {
+export interface Project {
   slug: string;
   title: string;
   category: string;
@@ -28,7 +28,7 @@ interface Project {
   isOngoing?: boolean;
 }
 
-interface SectionData {
+export interface SectionData {
   id: string;
   title: string;
   images: string[];

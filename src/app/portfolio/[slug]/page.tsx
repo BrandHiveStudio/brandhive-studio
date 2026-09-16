@@ -2,7 +2,9 @@ import fs from "fs";
 import path from "path";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ProjectClient from "./ProjectClient";
+import ProjectClient, { Project } from "./ProjectClient";
+import { getProjectBySlug } from "@/lib/db/queries/projects";
+import { getCurrentAdmin } from "@/lib/auth/session";
 
 const projectsData = [
   {
@@ -348,12 +350,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const project = projectsData.find((p) => p.slug === slug);
+  const admin = await getCurrentAdmin();
+  const allowDraft = Boolean(admin);
+  const dbData = await getProjectBySlug(slug, allowDraft);
+
+  if (dbData?.isDraft) {
+    notFound();
+  }
+
+  const project = dbData?.project || projectsData.find((p) => p.slug === slug);
 
   if (!project) {
-    return {
-      title: "Project Not Found | BrandHive Studio",
-    };
+    notFound();
   }
 
   return {
@@ -378,20 +386,49 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = projectsData.find((p) => p.slug === slug);
+  const admin = await getCurrentAdmin();
+  const allowDraft = Boolean(admin);
 
-  if (!project) {
+  const dbData = await getProjectBySlug(slug, allowDraft);
+
+  if (dbData?.isDraft) {
     notFound();
   }
 
-  const sections = getProjectAssets(project.folder);
+  const staticProject = projectsData.find((p) => p.slug === slug);
+
+  if (!dbData && !staticProject) {
+    notFound();
+  }
+
+  const rawProject = dbData?.project;
+  const project: Project = rawProject
+    ? {
+        slug: rawProject.slug,
+        title: rawProject.title,
+        category: rawProject.category,
+        shortDescription: rawProject.shortDescription,
+        description: rawProject.description,
+        cover: rawProject.cover,
+        logo: rawProject.logo,
+        client: rawProject.client,
+        role: rawProject.role,
+        year: rawProject.year,
+        deliverables: rawProject.badges || [],
+        isOngoing: rawProject.isOngoing,
+      }
+    : staticProject!;
+
+  const folderName = staticProject?.folder || project.title;
+  const localSections = getProjectAssets(folderName);
+  const sections = dbData && dbData.sections.length > 0 ? dbData.sections : localSections;
 
   const currentIndex = projectsData.findIndex((p) => p.slug === slug);
   const prevIndex = (currentIndex - 1 + projectsData.length) % projectsData.length;
   const nextIndex = (currentIndex + 1) % projectsData.length;
 
-  const prevProject = projectsData[prevIndex];
-  const nextProject = projectsData[nextIndex];
+  const prevProject: Project = projectsData[prevIndex] || project;
+  const nextProject: Project = projectsData[nextIndex] || project;
 
   return (
     <ProjectClient

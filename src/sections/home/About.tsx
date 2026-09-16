@@ -68,7 +68,11 @@ const floatAnimation = (yOffset = 6, duration = 5, delay = 0) => ({
   },
 });
 
-export default function About() {
+interface AboutProps {
+  contentMap?: Record<string, string>;
+}
+
+export default function About({ contentMap }: AboutProps = {}) {
   const [coords, setCoords] = useState({ rx: 0, ry: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -207,25 +211,25 @@ export default function About() {
                 variant="secondary"
                 className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF]"
               >
-                Who We Are
+                {contentMap?.["about_badge"] || "Who We Are"}
               </Badge>
             </motion.div>
 
             <motion.div variants={fadeUpVariants}>
               <Heading level="h2" className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white border-none pb-0">
-                Crafting Brands that Connect & Inspire
+                {contentMap?.["about_heading"] || "Crafting Brands that Connect & Inspire"}
               </Heading>
             </motion.div>
 
             <motion.div variants={fadeUpVariants}>
               <Text className="text-base text-white/70 leading-relaxed">
-                At BrandHive Studio, we blend design strategy, technology, and artistic thinking to build outstanding brands and digital platforms. We partner with ambitious organizations to transform ideas into premium digital assets.
+                {contentMap?.["about_story_lead"] || "At BrandHive Studio, we blend design strategy, technology, and artistic thinking to build outstanding brands and digital platforms. We partner with ambitious organizations to transform ideas into premium digital assets."}
               </Text>
             </motion.div>
 
             <motion.div variants={fadeUpVariants}>
               <Text className="text-base text-white/70 leading-relaxed">
-                Our workspace fosters collaboration, creative research, and iterative design thinking. By bringing team strategists and developers together, we deliver clean, optimized codebases that execute high-fidelity, responsive layouts seamlessly.
+                {contentMap?.["about_mission"] || "Our workspace fosters collaboration, creative research, and iterative design thinking. By bringing team strategists and developers together, we deliver clean, optimized codebases that execute high-fidelity, responsive layouts seamlessly."}
               </Text>
             </motion.div>
 

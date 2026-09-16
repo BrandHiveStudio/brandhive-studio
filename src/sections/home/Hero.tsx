@@ -104,7 +104,11 @@ const awardVariants: Variants = {
   },
 };
 
-export default function Hero() {
+interface HeroProps {
+  contentMap?: Record<string, string>;
+}
+
+export default function Hero({ contentMap }: HeroProps = {}) {
   const [coords, setCoords] = useState({ rx: 0, ry: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -208,7 +212,7 @@ export default function Hero() {
               className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF] backdrop-blur-md tracking-wider uppercase shadow-[0_0_15px_rgba(22,199,255,0.05)] cursor-default"
               data-cursor-hover
             >
-              Creative Branding & Digital Agency
+              {contentMap?.["hero_badge"] || "Creative Branding & Digital Agency"}
             </Badge>
           </motion.div>
 
@@ -219,10 +223,14 @@ export default function Hero() {
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white"
             >
               <span className="block overflow-hidden py-1">
-                <motion.span className="block" variants={lineVariants}>Building Brands</motion.span>
+                <motion.span className="block" variants={lineVariants}>
+                  {contentMap?.["hero_title_line1"] || "Building Brands"}
+                </motion.span>
               </span>
               <span className="block overflow-hidden py-1">
-                <motion.span className="block" variants={lineVariants}>That Get</motion.span>
+                <motion.span className="block" variants={lineVariants}>
+                  {contentMap?.["hero_title_line2"] || "That Get"}
+                </motion.span>
               </span>
               <span className="block overflow-hidden py-1">
                 <motion.span 
@@ -230,7 +238,7 @@ export default function Hero() {
                   style={{ animationDuration: "4.5s" }}
                   variants={lineVariants}
                 >
-                  Noticed.
+                  {contentMap?.["hero_title_highlight"] || "Noticed."}
                 </motion.span>
               </span>
             </motion.h1>
@@ -239,7 +247,7 @@ export default function Hero() {
           {/* Description */}
           <motion.div variants={fadeUpVariants}>
             <Text className="max-w-xl text-lg sm:text-xl text-white/70 leading-relaxed font-normal">
-              We help businesses grow with stunning brand identities, creative designs, powerful websites, and result-driven digital marketing.
+              {contentMap?.["hero_description"] || "We help businesses grow with stunning brand identities, creative designs, powerful websites, and result-driven digital marketing."}
             </Text>
           </motion.div>
 
@@ -257,7 +265,7 @@ export default function Hero() {
                   size="lg"
                   className="rounded-full text-[#050608] font-bold px-8 py-5 transition-all duration-300 bg-gradient-to-r from-[#16C7FF] via-[#00c4ff] to-[#0096C7] hover:from-[#60D6FF] hover:to-[#16C7FF] shadow-[0_0_20px_rgba(22,199,255,0.25)] cursor-pointer"
                 >
-                  Start a Project
+                  {contentMap?.["hero_cta_primary"] || "Start a Project"}
                 </Button>
               </Link>
             </motion.div>
@@ -268,7 +276,7 @@ export default function Hero() {
               aria-label="View BrandHive Studio work portfolio"
               data-cursor-label="VIEW"
             >
-              View our Work
+              {contentMap?.["hero_cta_secondary"] || "View our Work"}
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
                 &rarr;
               </span>
@@ -318,27 +326,27 @@ export default function Hero() {
                   variants={avatarChildVariants}
                   className="flex items-center justify-center size-10 rounded-full border border-white/15 bg-[#0C1117] text-white/90 text-[10px] font-bold shadow-sm z-10"
                 >
-                  +25
+                  +{parseInt(contentMap?.["stats_clients_number"] || "25", 10) || 25}
                 </motion.div>
               </motion.div>
               <div className="grid grid-cols-3 gap-6 text-white/70">
                 <div>
                   <p className="text-sm sm:text-base font-extrabold text-white leading-none">
-                    <Counter value={25} />+
+                    <Counter value={parseInt(contentMap?.["stats_clients_number"] || "25", 10) || 25} />{contentMap?.["stats_clients_suffix"] ?? "+"}
                   </p>
-                  <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Clients Served</span>
+                  <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">{contentMap?.["stats_clients_label"] || "Clients Served"}</span>
                 </div>
                 <div>
                   <p className="text-sm sm:text-base font-extrabold text-white leading-none">
-                    <Counter value={50} />+
+                    <Counter value={parseInt(contentMap?.["stats_projects_number"] || "50", 10) || 50} />{contentMap?.["stats_projects_suffix"] ?? "+"}
                   </p>
-                  <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Projects Delivered</span>
+                  <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">{contentMap?.["stats_projects_label"] || "Projects Delivered"}</span>
                 </div>
                 <div>
                   <p className="text-sm sm:text-base font-extrabold text-white leading-none">
-                    <Counter value={2} />+
+                    <Counter value={parseInt(contentMap?.["stats_years_number"] || "2", 10) || 2} />{contentMap?.["stats_years_suffix"] ?? "+"}
                   </p>
-                  <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Years of Experience</span>
+                  <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">{contentMap?.["stats_years_label"] || "Years of Experience"}</span>
                 </div>
               </div>
             </div>
@@ -357,8 +365,12 @@ export default function Hero() {
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider leading-none">AWWWARDS</p>
-                <span className="text-[10px] text-white/50 font-bold block mt-1">Honorable Member Agency 2026</span>
+                <p className="text-xs font-bold text-white uppercase tracking-wider leading-none">
+                  {contentMap?.["stats_awwwards_title"] || "AWWWARDS"}
+                </p>
+                <span className="text-[10px] text-white/50 font-bold block mt-1">
+                  {contentMap?.["stats_awwwards_subtitle"] || "Honorable Member Agency 2026"}
+                </span>
               </div>
             </motion.div>
 

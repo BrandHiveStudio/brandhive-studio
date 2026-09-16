@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PortfolioClient from "./PortfolioClient";
+import { getPublishedProjects } from "@/lib/db/queries/projects";
 
 export const metadata: Metadata = {
   title: "Our Work & Case Studies | BrandHive Studio",
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default function Page() {
-  return <PortfolioClient />;
+export default async function Page() {
+  const published = await getPublishedProjects();
+  return <PortfolioClient initialProjects={published.length > 0 ? published : undefined} />;
 }

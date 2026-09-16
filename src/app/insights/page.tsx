@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import InsightsClient from "./InsightsClient";
+import { getPublishedPosts } from "@/lib/db/queries/posts";
 
 export const metadata: Metadata = {
   title: "Insights & Perspectives | BrandHive Studio",
@@ -29,6 +30,8 @@ export const metadata: Metadata = {
   }
 };
 
-export default function Page() {
-  return <InsightsClient />;
+export default async function Page() {
+  const dynamicPosts = await getPublishedPosts();
+  return <InsightsClient initialPosts={dynamicPosts} />;
 }
+

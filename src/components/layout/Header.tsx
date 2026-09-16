@@ -65,6 +65,10 @@ export default function Header() {
     show: { x: 0, opacity: 1, transition: { type: "spring" as const, stiffness: 120, damping: 16 } },
   };
 
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <>
       {/* Outer Floating Wrapper */}

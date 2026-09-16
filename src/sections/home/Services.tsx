@@ -1,7 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion, Variants, useReducedMotion } from "framer-motion";
+import type { PublicService } from "@/lib/db/queries/services";
 import Section from "@/components/layout/Section";
 import Heading from "@/components/typography/Heading";
 import Text from "@/components/typography/Text";
@@ -81,8 +83,31 @@ const containerVariants: Variants = {
   },
 };
 
-export default function Services() {
+interface ServicesProps {
+  initialServices?: PublicService[];
+}
+
+export default function Services({ initialServices }: ServicesProps = {}) {
   const shouldReduceMotion = useReducedMotion();
+
+  const displayedServices = useMemo(() => {
+    if (initialServices && initialServices.length > 0) {
+      return initialServices.slice(0, 6).map((s, idx) => {
+        const matched = services.find(
+          (staticS) =>
+            staticS.title.toLowerCase() === s.title.toLowerCase() ||
+            staticS.title.toLowerCase().includes(s.title.toLowerCase())
+        );
+        return {
+          title: s.title,
+          description: s.shortDescription || s.description,
+          tags: s.tags && s.tags.length > 0 ? s.tags : matched?.tags || ["Strategy", "Design"],
+          icon: matched?.icon || services[idx % services.length].icon,
+        };
+      });
+    }
+    return services;
+  }, [initialServices]);
 
   const cardVariants: Variants = {
     hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40, filter: "blur(6px)" },
@@ -135,7 +160,7 @@ export default function Services() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8"
         >
-          {services.map((service, index) => (
+          {displayedServices.map((service, index) => (
             <motion.div key={index} variants={cardVariants} style={{ willChange: "transform, opacity" }} className="h-full">
               <Link href="/services" className="group block h-full focus-visible:outline-none" data-cursor-label="DISCOVER">
                   <Card className="reflection-sweep breathing-card relative flex flex-col h-full p-8 sm:p-10 rounded-3xl border border-white/10 bg-[#11161C]/55 hover:bg-[#161f28]/70 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:border-[#16C7FF]/35 hover:shadow-[0_20px_45px_rgba(22,199,255,0.1),0_0_25px_rgba(22,199,255,0.03)] hover:-translate-y-2 transition-all duration-350 ease-out">
