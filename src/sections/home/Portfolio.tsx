@@ -225,7 +225,7 @@ export default function Portfolio({ initialProjects }: PortfolioProps = {}) {
                           fill
                           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] opacity-90 group-hover:opacity-100"
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          placeholder="blur"
+                          placeholder={typeof project.image === "object" && Boolean(project.image?.blurDataURL) ? "blur" : undefined}
                           loading="lazy"
                         />
                       </motion.div>
@@ -244,7 +244,7 @@ export default function Portfolio({ initialProjects }: PortfolioProps = {}) {
                               width={32}
                               height={32}
                               className="object-contain transition-all duration-300 ease-out group-hover:brightness-[1.04] group-hover:contrast-[1.04]"
-                              placeholder="blur"
+                              placeholder={typeof project.logo === "object" && Boolean(project.logo?.blurDataURL) ? "blur" : undefined}
                               loading="lazy"
                             />
                         </div>

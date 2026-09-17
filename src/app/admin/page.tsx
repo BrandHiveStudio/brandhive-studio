@@ -21,7 +21,6 @@ import {
   GitBranch,
   Bot,
   MessageSquare,
-  Sparkles,
 } from "lucide-react";
 
 interface HealthStatus {
@@ -42,36 +41,17 @@ interface HealthStatus {
   };
 }
 
-interface WhatsAppWebhookStatus {
-  service: string;
-  status: string;
-  registeredNumber: string;
-  configuration: {
-    isReadyForLiveMessaging: boolean;
-    missingVariables: string[];
-    appSecretSecurityActive: boolean;
-  };
-}
-
 export default function AdminDashboardPage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [waStatus, setWaStatus] = useState<WhatsAppWebhookStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchHealth = async () => {
     setLoading(true);
     try {
-      const [res, waRes] = await Promise.all([
-        fetch("/api/admin/health"),
-        fetch("/api/whatsapp/webhook"),
-      ]);
+      const res = await fetch("/api/admin/health");
       if (res.ok) {
         const data = await res.json();
         setHealth(data);
-      }
-      if (waRes.ok) {
-        const waData = await waRes.json();
-        setWaStatus(waData);
       }
     } catch (err) {
       console.error("Failed to fetch infrastructure health:", err);
@@ -265,7 +245,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* WhatsApp AI Agent Ecosystem Card */}
+      {/* Website HIVE AI & Supabase Knowledge Base Card */}
       <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-[#0C121E] via-[#090E17] to-[#060A10] border border-[#16C7FF]/20 relative overflow-hidden shadow-2xl">
         <div className="absolute right-0 top-0 w-80 h-80 bg-[#16C7FF]/5 blur-[80px] rounded-full pointer-events-none" />
 
@@ -274,83 +254,53 @@ export default function AdminDashboardPage() {
             <div className="flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#16C7FF]/10 border border-[#16C7FF]/25 text-[#16C7FF] text-xs font-semibold">
                 <Bot className="size-3.5" />
-                <span>HIVE AI WhatsApp Agent</span>
+                <span>Website HIVE AI Concierge</span>
               </div>
-              {waStatus ? (
-                waStatus.configuration.isReadyForLiveMessaging ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Configured / Ready
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-semibold">
-                    <span className="size-1.5 rounded-full bg-amber-400" />
-                    Not Configured / Awaiting Meta Credentials
-                  </span>
-                )
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white/60 text-xs font-semibold">
-                  Checking Status...
-                </span>
-              )}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Connected / Live Supabase
+              </span>
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">
-              Meta WhatsApp Cloud API &amp; HIVE AI Knowledge Bridge
+              Website HIVE AI &amp; Live Supabase Knowledge Base
             </h2>
             <p className="text-xs text-white/60 max-w-2xl leading-relaxed">
-              Inbound webhook receiver and outbound Meta Graph API client connected to BrandHive Studio&apos;s registered WhatsApp number (+94 70 641 0093) with live CMS synchronization.
+              Authoritative live knowledge serving the website HIVE AI chat through /api/chat, including services, LKR pricing, add-ons, FAQs, and business information.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <a
-              href="https://wa.me/94706410093"
+            <Link
+              href="/"
               target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 text-xs font-semibold text-[#25D366] transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#16C7FF]/15 hover:bg-[#16C7FF]/25 border border-[#16C7FF]/30 text-xs font-semibold text-[#16C7FF] transition-all"
             >
               <MessageSquare className="size-3.5" />
-              <span>Test WhatsApp (+94 70 641 0093)</span>
-            </a>
-            <Link
-              href="/api/v1/knowledge/faqs"
-              target="_blank"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-xs font-medium text-white transition-all"
-            >
-              <Sparkles className="size-3.5 text-[#16C7FF]" />
-              <span>Inspect Knowledge API</span>
+              <span>Open Website Chat</span>
             </Link>
           </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Webhook State</div>
-            <div className="text-xs font-semibold text-white mt-1">
-              {waStatus?.configuration.isReadyForLiveMessaging ? "Configured & Live" : "Awaiting Credentials"}
-            </div>
-            <div className={`text-[10px] mt-0.5 ${waStatus?.configuration.isReadyForLiveMessaging ? "text-emerald-400" : "text-amber-400"}`}>
-              {waStatus?.configuration.isReadyForLiveMessaging
-                ? "Meta Graph API Ready"
-                : `${waStatus?.configuration.missingVariables.length ?? 3} variables pending`}
-            </div>
+            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Knowledge Source</div>
+            <div className="text-xs font-semibold text-white mt-1">Live Supabase Knowledge</div>
+            <div className="text-[10px] text-[#16C7FF] mt-0.5">Services, Pricing, Add-ons &amp; FAQs</div>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">AI Engine</div>
             <div className="text-xs font-semibold text-white mt-1">HIVE AI Engine</div>
-            <div className="text-[10px] text-emerald-400 mt-0.5">CMS Knowledge Fallback Active</div>
+            <div className="text-[10px] text-emerald-400 mt-0.5">Supabase Knowledge Matching Active</div>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Knowledge Source</div>
-            <div className="text-xs font-semibold text-white mt-1">Turso CMS Database</div>
-            <div className="text-[10px] text-[#16C7FF] mt-0.5">Published Services &amp; FAQs</div>
+            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Sync Mode</div>
+            <div className="text-xs font-semibold text-white mt-1">Runtime / No-Store</div>
+            <div className="text-[10px] text-[#16C7FF] mt-0.5">Changes available without redeploy</div>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Inbound Webhook</div>
-            <div className="text-xs font-semibold text-white mt-1">Meta Cloud API v21.0</div>
-            <div className="text-[10px] text-[#16C7FF] mt-0.5">
-              {waStatus?.configuration.appSecretSecurityActive ? "HMAC-SHA256 Active" : "/api/whatsapp/webhook"}
-            </div>
+            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Chat Route</div>
+            <div className="text-xs font-semibold text-white mt-1">/api/chat</div>
+            <div className="text-[10px] text-emerald-400 mt-0.5">Active &amp; Serving Visitors</div>
           </div>
         </div>
       </div>
