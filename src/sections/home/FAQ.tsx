@@ -19,7 +19,7 @@ export default function FAQ({ initialFaqs }: FaqProps) {
   // Active category filter state
   const [activeCategory, setActiveCategory] = useState<string>("All");
   // Open accordion indices (single or multi expand - single expand provides a cleaner Apple aesthetic)
-  const [openId, setOpenId] = useState<string | null>(faqsList[0]?.id || null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   // Extract unique categories
   const categories = ["All", ...Array.from(new Set(faqsList.map((f) => f.category)))];

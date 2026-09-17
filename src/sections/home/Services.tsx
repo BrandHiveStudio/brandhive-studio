@@ -9,6 +9,7 @@ import Heading from "@/components/typography/Heading";
 import Text from "@/components/typography/Text";
 import Badge from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/cards/Card";
+import { cn } from "@/lib/utils";
 
 const services = [
   {
@@ -158,12 +159,17 @@ export default function Services({ initialServices }: ServicesProps = {}) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8"
+          className={cn(
+            "grid gap-6 sm:gap-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8",
+            displayedServices.length === 4
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+              : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          )}
         >
           {displayedServices.map((service, index) => (
             <motion.div key={index} variants={cardVariants} style={{ willChange: "transform, opacity" }} className="h-full">
               <Link href="/services" className="group block h-full focus-visible:outline-none" data-cursor-label="DISCOVER">
-                  <Card className="reflection-sweep breathing-card relative flex flex-col h-full p-8 sm:p-10 rounded-3xl border border-white/10 bg-[#11161C]/55 hover:bg-[#161f28]/70 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:border-[#16C7FF]/35 hover:shadow-[0_20px_45px_rgba(22,199,255,0.1),0_0_25px_rgba(22,199,255,0.03)] hover:-translate-y-2 transition-all duration-350 ease-out">
+                  <Card className="reflection-sweep breathing-card relative flex flex-col h-full p-6 sm:p-8 xl:p-10 rounded-3xl border border-white/10 bg-[#11161C]/55 hover:bg-[#161f28]/70 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:border-[#16C7FF]/35 hover:shadow-[0_20px_45px_rgba(22,199,255,0.1),0_0_25px_rgba(22,199,255,0.03)] hover:-translate-y-2 transition-all duration-350 ease-out">
                     
                     {/* Subtle Honeycomb Backing */}
                     <div className="absolute top-4 right-4 size-16 text-[#16C7FF]/4 pointer-events-none select-none z-0">

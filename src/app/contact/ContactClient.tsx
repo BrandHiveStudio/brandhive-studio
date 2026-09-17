@@ -114,11 +114,11 @@ export default function ContactClient() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-center text-center gap-4 max-w-4xl mx-auto"
+            className="flex flex-col items-start text-left gap-6 max-w-4xl"
           >
             <Badge
               variant="secondary"
-              className="w-fit px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF] backdrop-blur-md tracking-wider uppercase"
+              className="w-fit px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF] backdrop-blur-md tracking-wider uppercase shadow-[0_0_15px_rgba(22,199,255,0.05)]"
             >
               Get In Touch
             </Badge>
@@ -128,7 +128,7 @@ export default function ContactClient() {
                 Incredible Together.
               </span>
             </Heading>
-            <Text className="text-white/70 text-base sm:text-lg leading-relaxed max-w-xl font-normal mt-2">
+            <Text className="text-white/70 text-lg sm:text-xl leading-relaxed max-w-3xl font-normal">
               Ready to elevate your brand? We&apos;d love to hear about your project.
             </Text>
           </motion.div>

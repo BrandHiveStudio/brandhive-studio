@@ -152,16 +152,16 @@ export default function Header() {
 
           {/* Desktop CTA Button */}
           <div className="hidden lg:block shrink-0 z-10">
-            <Link href="/contact" data-cursor-label="BUILD">
-              <Magnetic>
-                <button
-                  className="relative overflow-hidden rounded-full text-[#050608] font-bold text-sm px-7 py-3 transition-all duration-300 bg-gradient-to-r from-[#16C7FF]/90 via-[#00c4ff] to-[#0096C7]/90 hover:from-[#60D6FF] hover:to-[#16C7FF] shadow-md shadow-[#16C7FF]/10 hover:shadow-[0_8px_25px_rgba(22,199,255,0.35)] hover:-translate-y-0.5 cursor-pointer"
-                  aria-label="Start a Project with BrandHive Studio"
-                >
-                  Start a Project
-                </button>
-              </Magnetic>
-            </Link>
+            <Magnetic>
+              <Link
+                href="/contact"
+                data-cursor-label="BUILD"
+                className="relative inline-flex items-center justify-center overflow-hidden rounded-full text-[#050608] font-bold text-sm px-7 py-3 transition-all duration-300 bg-gradient-to-r from-[#16C7FF]/90 via-[#00c4ff] to-[#0096C7]/90 hover:from-[#60D6FF] hover:to-[#16C7FF] shadow-md shadow-[#16C7FF]/10 hover:shadow-[0_8px_25px_rgba(22,199,255,0.35)] hover:-translate-y-0.5 cursor-pointer outline-none focus:outline-none focus-visible:outline-none select-none"
+                aria-label="Start a Project with BrandHive Studio"
+              >
+                Start a Project
+              </Link>
+            </Magnetic>
           </div>
 
           {/* Mobile menu trigger */}
@@ -249,12 +249,13 @@ export default function Header() {
 
               {/* Mobile CTA */}
               <div className="pt-6 border-t border-white/10">
-                <Link href="/contact" className="block w-full" onClick={() => setIsOpen(false)}>
-                  <button
-                    className="w-full py-3 rounded-full text-[#050608] font-bold text-center bg-gradient-to-r from-[#16C7FF] to-[#0096C7] shadow-[0_0_15px_rgba(22,199,255,0.25)] transition-all active:scale-[0.98] cursor-pointer"
-                  >
-                    Start a Project
-                  </button>
+                <Link
+                  href="/contact"
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full py-3 rounded-full text-[#050608] font-bold text-center bg-gradient-to-r from-[#16C7FF] to-[#0096C7] shadow-[0_0_15px_rgba(22,199,255,0.25)] transition-all active:scale-[0.98] cursor-pointer outline-none focus:outline-none focus-visible:outline-none select-none"
+                  aria-label="Start a Project with BrandHive Studio"
+                >
+                  Start a Project
                 </Link>
               </div>
             </motion.div>

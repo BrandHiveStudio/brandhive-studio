@@ -190,7 +190,7 @@ export default function AboutClient() {
             <div className="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-[#16C7FF]/15 blur-[90px] pointer-events-none" />
             
             <div className="relative grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-16 z-10">
-              <div className="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
+              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
                 <Badge
                   variant="secondary"
                   className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF]"
@@ -205,16 +205,16 @@ export default function AboutClient() {
                 </Text>
               </div>
 
-              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-center justify-center lg:items-end gap-6 w-full">
+              <div className="lg:col-span-5 flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-5 sm:gap-6 w-full">
                 <motion.div
                   whileHover={{ y: -3, scale: 1.03, boxShadow: "0 0 25px rgba(22, 199, 255, 0.4)" }}
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  className="w-full sm:w-auto lg:w-full"
+                  className="shrink-0"
                 >
-                  <Link href="/contact" className="w-full block">
+                  <Link href="/contact" className="inline-block rounded-full outline-none focus:outline-none">
                     <Button
                       size="lg"
-                      className="w-full rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-6 shadow-md transition-all duration-300 text-center cursor-pointer"
+                      className="rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-6 shadow-md transition-all duration-300 text-center cursor-pointer"
                     >
                       Start a Project
                     </Button>
@@ -223,7 +223,7 @@ export default function AboutClient() {
                 
                 <Link
                   href="/contact"
-                  className="text-sm font-semibold text-white hover:text-[#16C7FF] transition-colors duration-300"
+                  className="text-sm font-semibold text-white hover:text-[#16C7FF] transition-colors duration-300 whitespace-nowrap"
                 >
                   Contact Our Team &rarr;
                 </Link>

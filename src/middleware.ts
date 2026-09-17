@@ -36,9 +36,21 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const authenticated = await isValidSession(token);
 
-    // If accessing login page while already authenticated, redirect to /admin
-    if (pathname === "/admin/login") {
-      if (authenticated) {
+    // Whitelist public admin auth routes
+    const publicAdminPaths = [
+      "/admin/login",
+      "/admin/forgot-password",
+      "/admin/reset-password",
+      "/admin/verify-email",
+    ];
+
+    const isPublicAdminPath = publicAdminPaths.some(
+      (path) => pathname === path || pathname.startsWith(path + "/")
+    );
+
+    if (isPublicAdminPath) {
+      // If already authenticated and visiting login or forgot-password, redirect to dashboard
+      if (authenticated && (pathname === "/admin/login" || pathname === "/admin/forgot-password")) {
         return NextResponse.redirect(new URL("/admin", request.url));
       }
       return NextResponse.next();

@@ -50,8 +50,14 @@ export default function AdminShell({ children }: AdminShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Do not render shell for the login page
-  if (pathname === "/admin/login") {
+  // Do not render shell for public authentication pages
+  const isAuthPage =
+    pathname === "/admin/login" ||
+    pathname === "/admin/forgot-password" ||
+    pathname?.startsWith("/admin/reset-password") ||
+    pathname?.startsWith("/admin/verify-email");
+
+  if (isAuthPage) {
     return <>{children}</>;
   }
 

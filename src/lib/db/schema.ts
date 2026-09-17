@@ -31,6 +31,21 @@ export const adminSessions = sqliteTable("admin_sessions", {
     .default(sql`(unixepoch())`),
 });
 
+export const adminAuthTokens = sqliteTable("admin_auth_tokens", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => adminUsers.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // "password_reset" | "email_verification"
+  tokenHash: text("token_hash").notNull(),
+  metadata: text("metadata"), // JSON string e.g. { newEmail: string }
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  usedAt: integer("used_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
 // ============================================================================
 // FOUNDATIONAL CMS SCHEMA (PREPARED FOR FUTURE STEPS)
 // ============================================================================
@@ -229,6 +244,10 @@ export const processSteps = sqliteTable("process_steps", {
 
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type NewAdminUser = typeof adminUsers.$inferInsert;
+export type AdminSession = typeof adminSessions.$inferSelect;
+export type NewAdminSession = typeof adminSessions.$inferInsert;
+export type AdminAuthToken = typeof adminAuthTokens.$inferSelect;
+export type NewAdminAuthToken = typeof adminAuthTokens.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type ProjectImage = typeof projectImages.$inferSelect;

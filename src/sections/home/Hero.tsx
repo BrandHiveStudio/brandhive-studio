@@ -260,7 +260,7 @@ export default function Hero({ contentMap }: HeroProps = {}) {
               whileHover={{ y: -2, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
             >
-              <Link href="/contact" data-cursor-label="BUILD">
+              <Link href="/contact" data-cursor-label="BUILD" className="inline-block rounded-full outline-none focus:outline-none focus-visible:outline-none">
                 <Button
                   size="lg"
                   className="rounded-full text-[#050608] font-bold px-8 py-5 transition-all duration-300 bg-gradient-to-r from-[#16C7FF] via-[#00c4ff] to-[#0096C7] hover:from-[#60D6FF] hover:to-[#16C7FF] shadow-[0_0_20px_rgba(22,199,255,0.25)] cursor-pointer"

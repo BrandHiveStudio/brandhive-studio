@@ -42,17 +42,36 @@ interface HealthStatus {
   };
 }
 
+interface WhatsAppWebhookStatus {
+  service: string;
+  status: string;
+  registeredNumber: string;
+  configuration: {
+    isReadyForLiveMessaging: boolean;
+    missingVariables: string[];
+    appSecretSecurityActive: boolean;
+  };
+}
+
 export default function AdminDashboardPage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [waStatus, setWaStatus] = useState<WhatsAppWebhookStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchHealth = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/health");
+      const [res, waRes] = await Promise.all([
+        fetch("/api/admin/health"),
+        fetch("/api/whatsapp/webhook"),
+      ]);
       if (res.ok) {
         const data = await res.json();
         setHealth(data);
+      }
+      if (waRes.ok) {
+        const waData = await waRes.json();
+        setWaStatus(waData);
       }
     } catch (err) {
       console.error("Failed to fetch infrastructure health:", err);
@@ -252,15 +271,34 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#16C7FF]/10 border border-[#16C7FF]/25 text-[#16C7FF] text-xs font-semibold">
-              <Bot className="size-3.5" />
-              <span>WhatsApp AI Chatbot & Knowledge Bridge</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#16C7FF]/10 border border-[#16C7FF]/25 text-[#16C7FF] text-xs font-semibold">
+                <Bot className="size-3.5" />
+                <span>HIVE AI WhatsApp Agent</span>
+              </div>
+              {waStatus ? (
+                waStatus.configuration.isReadyForLiveMessaging ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Configured / Ready
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-semibold">
+                    <span className="size-1.5 rounded-full bg-amber-400" />
+                    Not Configured / Awaiting Meta Credentials
+                  </span>
+                )
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white/60 text-xs font-semibold">
+                  Checking Status...
+                </span>
+              )}
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">
-              Production WhatsApp AI Agent (Gemini + Supabase)
+              Meta WhatsApp Cloud API &amp; HIVE AI Knowledge Bridge
             </h2>
             <p className="text-xs text-white/60 max-w-2xl leading-relaxed">
-              Meta WhatsApp Cloud API webhook, Google Gemini function-calling tools, and Supabase Knowledge Base operate with live synchronization from BrandHive Website CMS.
+              Inbound webhook receiver and outbound Meta Graph API client connected to BrandHive Studio&apos;s registered WhatsApp number (+94 70 641 0093) with live CMS synchronization.
             </p>
           </div>
 
@@ -287,24 +325,32 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">AI Engine</div>
-            <div className="text-xs font-semibold text-white mt-1">Google Gemini</div>
-            <div className="text-[10px] text-emerald-400 mt-0.5">5 Knowledge Tools Active</div>
+            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Webhook State</div>
+            <div className="text-xs font-semibold text-white mt-1">
+              {waStatus?.configuration.isReadyForLiveMessaging ? "Configured & Live" : "Awaiting Credentials"}
+            </div>
+            <div className={`text-[10px] mt-0.5 ${waStatus?.configuration.isReadyForLiveMessaging ? "text-emerald-400" : "text-amber-400"}`}>
+              {waStatus?.configuration.isReadyForLiveMessaging
+                ? "Meta Graph API Ready"
+                : `${waStatus?.configuration.missingVariables.length ?? 3} variables pending`}
+            </div>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Knowledge Base</div>
-            <div className="text-xs font-semibold text-white mt-1">Supabase Postgres</div>
-            <div className="text-[10px] text-[#16C7FF] mt-0.5">Dynamic Pricing & Add-ons</div>
+            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">AI Engine</div>
+            <div className="text-xs font-semibold text-white mt-1">HIVE AI Engine</div>
+            <div className="text-[10px] text-emerald-400 mt-0.5">CMS Knowledge Fallback Active</div>
+          </div>
+          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
+            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Knowledge Source</div>
+            <div className="text-xs font-semibold text-white mt-1">Turso CMS Database</div>
+            <div className="text-[10px] text-[#16C7FF] mt-0.5">Published Services &amp; FAQs</div>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Inbound Webhook</div>
-            <div className="text-xs font-semibold text-white mt-1">Meta Cloud API</div>
-            <div className="text-[10px] text-emerald-400 mt-0.5">HMAC-SHA256 Verified</div>
-          </div>
-          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/40">Sync Bridge</div>
-            <div className="text-xs font-semibold text-white mt-1">CMS Knowledge API</div>
-            <div className="text-[10px] text-[#16C7FF] mt-0.5">FAQs & Business Metas</div>
+            <div className="text-xs font-semibold text-white mt-1">Meta Cloud API v21.0</div>
+            <div className="text-[10px] text-[#16C7FF] mt-0.5">
+              {waStatus?.configuration.appSecretSecurityActive ? "HMAC-SHA256 Active" : "/api/whatsapp/webhook"}
+            </div>
           </div>
         </div>
       </div>

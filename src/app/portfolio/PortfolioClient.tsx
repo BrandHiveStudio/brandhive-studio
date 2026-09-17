@@ -261,17 +261,17 @@ export default function PortfolioClient({ initialProjects }: PortfolioClientProp
       {/* 1. Header Section */}
       <Section className="pb-12 lg:pb-16 bg-transparent">
         <Container>
-          <div className="flex flex-col items-center text-center gap-5 max-w-4xl mx-auto">
+          <div className="flex flex-col items-start text-left gap-6 max-w-4xl">
             <Badge
               variant="secondary"
-              className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF] backdrop-blur-md shadow-[0_0_15px_rgba(22,199,255,0.05)]"
+              className="w-fit px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF] backdrop-blur-md tracking-wider uppercase shadow-[0_0_15px_rgba(22,199,255,0.05)]"
             >
               Our Portfolio
             </Badge>
-            <Heading level="h1" className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white border-none pb-0 leading-tight">
+            <Heading level="h1" className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white border-none pb-0">
               Crafting Digital Experiences That Deliver Results
             </Heading>
-            <Text className="text-white/60 text-base sm:text-lg max-w-2xl leading-relaxed">
+            <Text className="text-white/70 text-lg sm:text-xl leading-relaxed max-w-3xl font-normal">
               Showcasing carefully crafted branding, websites, social media, UI/UX, and digital experiences built for real businesses.
             </Text>
           </div>
@@ -491,7 +491,7 @@ export default function PortfolioClient({ initialProjects }: PortfolioClientProp
             <div className="relative grid grid-cols-1 lg:grid-cols-12 items-center gap-10 sm:gap-14 lg:gap-16 z-10">
               
               {/* Left Column Text */}
-              <div className="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
+              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
                 <Badge
                   variant="secondary"
                   className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-white/10 bg-[#11161C]/50 text-[#16C7FF]"
@@ -507,7 +507,7 @@ export default function PortfolioClient({ initialProjects }: PortfolioClientProp
               </div>
 
               {/* Right Column CTA buttons */}
-              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-center justify-center lg:items-end gap-5 w-full">
+              <div className="lg:col-span-5 flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-5 sm:gap-6 w-full">
                 <motion.div
                   whileHover={{
                     y: -2,
@@ -515,12 +515,12 @@ export default function PortfolioClient({ initialProjects }: PortfolioClientProp
                     boxShadow: "0 0 25px rgba(22, 199, 255, 0.4)",
                   }}
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  className="w-full sm:w-auto lg:w-full"
+                  className="shrink-0"
                 >
-                  <Link href="/contact" className="w-full block">
+                  <Link href="/contact" className="inline-block rounded-full outline-none focus:outline-none">
                     <Button
                       size="lg"
-                      className="w-full rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-5 shadow-md transition-all duration-300 text-center cursor-pointer"
+                      className="rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-5 shadow-md transition-all duration-300 text-center cursor-pointer"
                     >
                       Start Your Project
                     </Button>
@@ -529,7 +529,7 @@ export default function PortfolioClient({ initialProjects }: PortfolioClientProp
                 
                 <Link
                   href="/contact"
-                  className="text-sm font-semibold text-white hover:text-[#16C7FF] transition-colors duration-300"
+                  className="text-sm font-semibold text-white hover:text-[#16C7FF] transition-colors duration-300 whitespace-nowrap"
                 >
                   Contact Us &rarr;
                 </Link>

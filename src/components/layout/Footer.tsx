@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import Container from "./Container";
 import Text from "@/components/typography/Text";
-import Magnetic from "@/components/ui/Magnetic";
 
 const footerLinks = {
   services: [
@@ -210,46 +209,8 @@ export default function Footer() {
     return null;
   }
 
-  const isHomePage = pathname === "/";
-
   return (
     <>
-      {/* Premium Pre-Footer CTA (Only displayed on internal pages to prevent double banners on the homepage) */}
-      {!isHomePage && (
-        <div className="border-b border-white/5 relative py-12 lg:py-16 bg-transparent z-10 overflow-hidden">
-          {/* Background ambient light for transition */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[120px] bg-[#16C7FF]/4.5 blur-[90px] rounded-full pointer-events-none" />
-
-          <Container>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 max-w-[950px] mx-auto text-center md:text-left">
-              <div className="flex flex-col gap-3 max-w-xl">
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
-                  {pathname === "/services" ? "Let's Build Something Incredible." : "Ready to Build Something Incredible?"}
-                </h3>
-                <p className="text-sm sm:text-base text-white/60 leading-relaxed font-normal">
-                  {pathname === "/services"
-                    ? "Partner with BrandHive Studio to create impactful brands, premium digital experiences, and intelligent technology solutions that move ideas forward."
-                    : "Let's collaborate to craft a brand identity and website that defines your industry."}
-                </p>
-              </div>
-
-              <div className="shrink-0 z-10">
-                <Link href="/contact" data-cursor-label="BUILD">
-                  <Magnetic>
-                    <button
-                      className="relative overflow-hidden rounded-full text-[#050608] font-bold text-sm px-8 py-4 transition-all duration-300 bg-gradient-to-r from-[#16C7FF]/90 via-[#00c4ff] to-[#0096C7]/90 hover:from-[#60D6FF] hover:to-[#16C7FF] shadow-md shadow-[#16C7FF]/10 hover:shadow-[0_8px_25px_rgba(22,199,255,0.35)] hover:-translate-y-0.5 cursor-pointer"
-                      aria-label="Let's Build Something Incredible with BrandHive Studio"
-                    >
-                      Let&apos;s Build Something Incredible
-                    </button>
-                  </Magnetic>
-                </Link>
-              </div>
-            </div>
-          </Container>
-        </div>
-      )}
-
       {/* Main Footer Block */}
       <footer className="relative overflow-hidden bg-[#050608] border-t border-white/5 text-white/50 pt-4 pb-1 lg:pt-5 lg:pb-1.5">
         {/* Blueprint Grid */}

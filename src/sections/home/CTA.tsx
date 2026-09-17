@@ -59,7 +59,7 @@ export default function CTA({ contentMap }: CTAProps = {}) {
             <div className="relative grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-16 z-10">
               
               {/* Left Content Area */}
-              <div className="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
+              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
                 <motion.div variants={itemVariants}>
                   <Badge
                     variant="secondary"
@@ -83,9 +83,9 @@ export default function CTA({ contentMap }: CTAProps = {}) {
               </div>
 
               {/* Right Buttons Area */}
-              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-center justify-center lg:items-end gap-6">
+              <div className="lg:col-span-5 flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-5 sm:gap-6">
                 {/* Primary Button — cta-sweep-auto adds periodic light sweep */}
-                <motion.div variants={itemVariants} className="w-full sm:w-auto lg:w-full flex justify-center lg:justify-end">
+                <motion.div variants={itemVariants} className="shrink-0">
                   <motion.div
                     whileHover={{
                       y: -3,
@@ -93,12 +93,11 @@ export default function CTA({ contentMap }: CTAProps = {}) {
                       boxShadow: "0 0 28px rgba(22, 199, 255, 0.5)",
                     }}
                     transition={{ type: "spring", stiffness: 220, damping: 16 }}
-                    className="w-full sm:w-auto lg:w-full"
                   >
-                    <Link href="/contact" className="w-full block">
+                    <Link href="/contact" className="inline-block rounded-full outline-none focus:outline-none">
                       <Button
                         size="lg"
-                        className="cta-sweep-auto w-full rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-6 shadow-[0_0_20px_rgba(22,199,255,0.2)] hover:from-[#60D6FF] hover:to-[#16C7FF] transition-all duration-300 text-center cursor-pointer"
+                        className="cta-sweep-auto rounded-full bg-gradient-to-r from-[#16C7FF] to-[#0096C7] text-[#050608] font-bold px-8 py-6 shadow-[0_0_20px_rgba(22,199,255,0.2)] hover:from-[#60D6FF] hover:to-[#16C7FF] transition-all duration-300 text-center cursor-pointer"
                         aria-label="Start a Project with BrandHive Studio"
                       >
                         {contentMap?.["cta_button_text"] || "Start a Project"}
@@ -108,10 +107,10 @@ export default function CTA({ contentMap }: CTAProps = {}) {
                 </motion.div>
 
                 {/* Secondary Link */}
-                <motion.div variants={itemVariants} className="flex justify-center lg:justify-end">
+                <motion.div variants={itemVariants} className="shrink-0 flex items-center">
                   <Link
                     href="/portfolio"
-                    className="group flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-[#16C7FF] transition-colors duration-300"
+                    className="group flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-[#16C7FF] transition-colors duration-300 whitespace-nowrap"
                     aria-label="View our portfolio of projects"
                   >
                     View Our Portfolio
