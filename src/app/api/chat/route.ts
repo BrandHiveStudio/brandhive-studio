@@ -19,7 +19,7 @@ type ChatResponse = {
 };
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-async function callOpenAI(payload: ChatPayload): Promise<ChatResponse> {
+async function callGemini(payload: ChatPayload): Promise<ChatResponse> {
   return processHiveMessage({
     message: payload.message,
     history: payload.history,
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const response = await callOpenAI(body);
+    const response = await callGemini(body);
     return NextResponse.json(response);
   } catch {
     return NextResponse.json(
