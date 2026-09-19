@@ -300,8 +300,22 @@ function normalizeForSearch(text: string): string {
 }
 
 const FAQ_STOP_WORDS = new Set([
+  // English common stopwords, pronouns & question words
   "what", "is", "are", "your", "you", "the", "a", "an", "do", "i",
-  "can", "how", "to", "in", "for", "of", "we", "our"
+  "can", "how", "to", "in", "for", "of", "we", "our", "they", "them",
+  "their", "this", "that", "those", "it", "its", "much", "many", "any",
+  "some", "all", "tell", "me", "say", "show", "give", "explain",
+  "there", "here", "where", "when", "why", "which", "who", "be",
+  "have", "has", "had", "having", "please", "pls", "thank", "thanks",
+  "one", "first", "second", "third", "about", "with", "from", "at",
+  "get", "got", "just", "like", "also", "very", "more", "now",
+  // Singlish common pronouns & question words
+  "monawada", "monada", "keeyada", "kiyada", "kohomada", "eka", "ekak",
+  "thiyenne", "thiyenawada", "puluwanda", "mata", "ape", "oyala", "neda",
+  "thawa", "kiyanna", "hari", "mokakda",
+  // Tanglish common pronouns & question words
+  "enna", "evlo", "evvlavu", "adhu", "irukku", "pathi", "sollunga", "vilai",
+  "solla", "kudunga", "unga", "ungalukku"
 ]);
 
 function scoreFaqMatch(query: string, faq: Faq): number {
@@ -310,15 +324,15 @@ function scoreFaqMatch(query: string, faq: Faq): number {
     .filter((t) => t.length >= 2);
 
   const contentTerms = allTerms.filter((t) => !FAQ_STOP_WORDS.has(t));
-  const terms = contentTerms.length > 0 ? contentTerms : allTerms;
 
-  if (terms.length === 0) return 0;
+  // If there are no substantive content terms, NEVER match an FAQ
+  if (contentTerms.length === 0) return 0;
 
   const qText = normalizeForSearch(faq.question);
   const cText = normalizeForSearch(faq.category || "");
   const aText = normalizeForSearch(faq.answer);
 
-  return terms.reduce((score, term) => {
+  const totalScore = contentTerms.reduce((score, term) => {
     let pts = 0;
     const isPay = term.startsWith("pay") && qText.includes("pay");
 
@@ -328,11 +342,14 @@ function scoreFaqMatch(query: string, faq: Faq): number {
     // Category match (2 points)
     if (cText.includes(term) || (term.startsWith("pay") && cText.includes("pay"))) pts += 2;
 
-    // Incidental answer text match (1 point)
-    if (pts === 0 && aText.includes(term)) pts += 1;
+    // Incidental answer text match (only 1 point if term is substantial, length >= 4)
+    if (pts === 0 && term.length >= 4 && aText.includes(term)) pts += 1;
 
     return score + pts;
   }, 0);
+
+  // Require minimum confidence score of 3 to avoid weak or incidental answer matches
+  return totalScore >= 3 ? totalScore : 0;
 }
 
 const ITEM_TYPE_KEYWORDS: Record<string, ServiceItemType> = {

@@ -32,8 +32,6 @@ const suggestions = [
   "View Portfolio",
 ];
 
-const STORAGE_KEY = "brandhive-chat-history";
-
 interface FloatingChatbotDialogProps {
   onClose: () => void;
 }
@@ -49,29 +47,29 @@ export default function FloatingChatbotDialog({ onClose }: FloatingChatbotDialog
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
   const messageId = useRef(1);
+  const isSubmittingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
+  // Purge any legacy persistent chat history on mount and cleanup in-flight requests on unmount
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as ChatMessage[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed);
-          messageId.current = parsed[parsed.length - 1].id;
-        }
-      }
+      window.localStorage.removeItem("brandhive-chat-history");
     } catch {
-      window.localStorage.removeItem(STORAGE_KEY);
+      // Ignore storage restrictions
     }
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      try {
+        window.localStorage.removeItem("brandhive-chat-history");
+      } catch {
+        // Ignore storage restrictions
+      }
+    };
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => inputRef.current?.focus(), 180);
@@ -87,28 +85,56 @@ export default function FloatingChatbotDialog({ onClose }: FloatingChatbotDialog
     };
   }, []);
 
+  const handleClose = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    isSubmittingRef.current = false;
+    setIsReplying(false);
+    setDraft("");
+    setLeadCaptureOpen(false);
+    setLeadStatus("idle");
+    setLeadError("");
+    try {
+      window.localStorage.removeItem("brandhive-chat-history");
+    } catch {
+      // Ignore
+    }
+    onClose();
+  };
+
   const sendMessage = async (value: string) => {
     const text = value.trim();
-    if (!text || isReplying) return;
+    if (!text || isReplying || isSubmittingRef.current) return;
+
+    isSubmittingRef.current = true;
+    setDraft("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
 
     const visitorMessage = { id: messageId.current + 1, author: "visitor" as const, text };
     const nextMessages = [...messages, visitorMessage];
 
     messageId.current = visitorMessage.id;
     setMessages(nextMessages);
-    setDraft("");
     setLeadCaptureOpen(false);
     setLeadStatus("idle");
     setLeadError("");
     setIsReplying(true);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           message: text,
-          history: nextMessages.slice(-8).map((entry) => ({
+          history: messages.slice(-8).map((entry) => ({
             role: entry.author === "assistant" ? "assistant" : "user",
             content: entry.text,
           })),
@@ -127,13 +153,18 @@ export default function FloatingChatbotDialog({ onClose }: FloatingChatbotDialog
       if (data?.needsLeadCapture) {
         setLeadCaptureOpen(true);
       }
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       messageId.current += 1;
       setMessages((current) => [
         ...current,
         { id: messageId.current, author: "assistant", text: "I’m having trouble reaching the assistant right now. Please try again or contact us directly." },
       ]);
     } finally {
+      abortControllerRef.current = null;
+      isSubmittingRef.current = false;
       setIsReplying(false);
     }
   };
@@ -232,7 +263,7 @@ export default function FloatingChatbotDialog({ onClose }: FloatingChatbotDialog
             </p>
           </div>
         </div>
-        <button type="button" onClick={onClose} className="relative grid size-9 place-items-center rounded-full text-white/60 transition hover:bg-white/8 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16C7FF]" aria-label="Close chat">
+        <button type="button" onClick={handleClose} className="relative grid size-9 place-items-center rounded-full text-white/60 transition hover:bg-white/8 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16C7FF]" aria-label="Close chat">
           <X className="size-4" aria-hidden="true" />
         </button>
       </div>

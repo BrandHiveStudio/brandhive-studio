@@ -12,7 +12,18 @@ const FloatingChatbotDialog = dynamic(() => import("./FloatingChatbotDialog"), {
 
 export default function FloatingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [chatSessionKey, setChatSessionKey] = useState(0);
   const shouldReduceMotion = useReducedMotion();
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setChatSessionKey((prev) => prev + 1);
+    try {
+      window.localStorage.removeItem("brandhive-chat-history");
+    } catch {
+      // Ignore
+    }
+  };
 
   return (
     <>
@@ -24,7 +35,7 @@ export default function FloatingChatbot() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           />
         )}
       </AnimatePresence>
@@ -32,7 +43,7 @@ export default function FloatingChatbot() {
       <div className="fixed bottom-4 right-4 z-[70] flex flex-col items-end sm:bottom-6 sm:right-6">
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <FloatingChatbotDialog key="brandhive-chat" onClose={() => setIsOpen(false)} />
+            <FloatingChatbotDialog key={`brandhive-chat-${chatSessionKey}`} onClose={handleClose} />
           ) : (
             <motion.button
               key="chat-toggle"
