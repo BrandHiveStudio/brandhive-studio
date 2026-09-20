@@ -1,5 +1,6 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+
 
 // ============================================================================
 // ADMIN & AUTHENTICATION FOUNDATION
@@ -270,5 +271,122 @@ export type NewTestimonial = typeof testimonials.$inferInsert;
 export type SiteContentItem = typeof siteContent.$inferSelect;
 export type NewSiteContentItem = typeof siteContent.$inferInsert;
 
+// ============================================================================
+// DEDICATED HIVE AI BRAIN SCHEMA (AUTHORITATIVE WEBSITE KNOWLEDGE)
+// ============================================================================
 
+export const brainServices = sqliteTable(
+  "brain_services",
+  {
+    id: text("id").primaryKey(),
+    slug: text("slug").notNull().unique(),
+    name: text("name").notNull(),
+    description: text("description"),
+    category: text("category").notNull().default("general"),
+    itemType: text("item_type").notNull().default("service"), // "service" | "package"
+    pricingType: text("pricing_type").notNull().default("fixed"), // "fixed" | "starting_from" | "custom_quote"
+    price: real("price"),
+    startingPrice: real("starting_price"),
+    currency: text("currency").notNull().default("LKR"),
+    unit: text("unit"),
+    adBudgetSeparate: integer("ad_budget_separate", { mode: "boolean" }).notNull().default(false),
+    sku: text("sku"),
+    inclusions: text("inclusions"), // JSON array of strings
+    exclusions: text("exclusions"), // JSON array of strings
+    metadata: text("metadata"), // JSON object
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (table) => [
+    index("idx_brain_services_category").on(table.category),
+    index("idx_brain_services_item_type").on(table.itemType),
+    index("idx_brain_services_is_active").on(table.isActive),
+    index("idx_brain_services_display_order").on(table.displayOrder),
+  ]
+);
 
+export const brainAddons = sqliteTable(
+  "brain_addons",
+  {
+    id: text("id").primaryKey(),
+    serviceId: text("service_id").references(() => brainServices.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    pricingType: text("pricing_type").notNull().default("fixed"), // "fixed" | "starting_from" | "custom_quote"
+    price: real("price"),
+    startingPrice: real("starting_price"),
+    currency: text("currency").notNull().default("LKR"),
+    unit: text("unit"),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (table) => [
+    index("idx_brain_addons_service_id").on(table.serviceId),
+    index("idx_brain_addons_is_active").on(table.isActive),
+  ]
+);
+
+export const brainFaqs = sqliteTable(
+  "brain_faqs",
+  {
+    id: text("id").primaryKey(),
+    question: text("question").notNull(),
+    answer: text("answer").notNull(),
+    category: text("category").notNull().default("general"),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (table) => [
+    index("idx_brain_faqs_category").on(table.category),
+    index("idx_brain_faqs_is_active").on(table.isActive),
+    index("idx_brain_faqs_display_order").on(table.displayOrder),
+  ]
+);
+
+export const brainSettings = sqliteTable(
+  "brain_settings",
+  {
+    id: text("id").primaryKey(),
+    key: text("key").notNull().unique(),
+    value: text("value").notNull(), // JSON string or plain text
+    description: text("description"),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (table) => [
+    index("idx_brain_settings_key").on(table.key),
+    index("idx_brain_settings_is_active").on(table.isActive),
+  ]
+);
+
+export type BrainService = typeof brainServices.$inferSelect;
+export type NewBrainService = typeof brainServices.$inferInsert;
+export type BrainAddon = typeof brainAddons.$inferSelect;
+export type NewBrainAddon = typeof brainAddons.$inferInsert;
+export type BrainFaq = typeof brainFaqs.$inferSelect;
+export type NewBrainFaq = typeof brainFaqs.$inferInsert;
+export type BrainSetting = typeof brainSettings.$inferSelect;
+export type NewBrainSetting = typeof brainSettings.$inferInsert;

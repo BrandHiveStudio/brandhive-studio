@@ -23,6 +23,7 @@ import {
   HelpCircle,
   Newspaper,
   GitBranch,
+  Brain,
 } from "lucide-react";
 
 interface AdminShellProps {
@@ -31,6 +32,7 @@ interface AdminShellProps {
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "HIVE AI Brain", href: "/admin/brain", icon: Brain },
   { name: "Inquiries", href: "/admin/inquiries", icon: Inbox },
   { name: "Projects", href: "/admin/projects", icon: FolderKanban },
   { name: "Media Library", href: "/admin/media", icon: ImageIcon },

@@ -1,21 +1,21 @@
 import {
-  fetchActiveServices,
-  getServicePricing,
-  listAddons,
-  searchServices,
-  searchFaqs,
-  getBusinessInfo,
-  formatPriceDisplay,
-  type Service,
-  type ServicePricingDetail,
-} from "@/lib/knowledge/supabase-knowledge";
+  getBrainCompanyProfile,
+  fetchActiveBrainServices,
+  fetchActiveBrainAddons,
+  fetchActiveBrainFaqs,
+  getBrainServicePricing,
+  searchBrainFaqs,
+  formatBrainPriceDisplay,
+  fallbackCompanyProfile,
+  type CompanyProfile,
+} from "@/lib/knowledge/turso-brain-knowledge";
+import type { BrainService, BrainAddon, BrainFaq } from "@/lib/db/schema";
 import { getPublishedFaqs, fallbackFaqs } from "@/lib/db/queries/faqs";
-import { getPublishedServices } from "@/lib/db/queries/services";
 
 export interface HiveMessageOptions {
   message: string;
   history?: Array<{ role: "assistant" | "user"; content: string }>;
-  channel?: "web" | "whatsapp";
+  channel?: "web";
   senderName?: string;
 }
 
@@ -26,191 +26,19 @@ export interface HiveResponse {
 }
 
 /**
- * Standard BrandHive Studio profile used for WhatsApp and base fallback.
- * Strictly preserved for WhatsApp bot consistency.
+ * Standard BrandHive Studio profile used for base website fallback.
  */
-export const companyProfile = {
-  name: "BrandHive Studio",
-  tagline: "Premium branding and digital experiences",
-  contactNumber: "+94 70 641 0093",
-  whatsappUrl: "https://wa.me/94706410093",
-  email: "brandhive.studio.lk@gmail.com",
-  websiteUrl: "https://brandhivestudio.com.lk",
-  services: [
-    "Brand Strategy & Positioning",
-    "Visual Identity & Logo Systems",
-    "Website Design & Full-Stack Development",
-    "Digital Marketing & Growth Strategy",
-    "UI/UX Experience Design",
-    "Packaging & Motion Graphics",
-  ],
-  process: ["Discovery", "Strategy", "Design", "Development", "Launch"],
-};
+export const companyProfile = fallbackCompanyProfile;
 
 // =============================================================================
-// SECTION 1: WHATSAPP LOGIC (STRICTLY PRESERVED & BEHAVIORALLY UNCHANGED)
+// WEBSITE HIVE AI LOGIC (LIVE TURSO BRAIN KNOWLEDGE INTEGRATION)
 // =============================================================================
 
 /**
- * WhatsApp fallback logic — completely preserved from original implementation.
- * Zero changes to WhatsApp responses, formatting, pricing behavior, or decision logic.
+ * Retrieve dynamic agency business info for the website from the live Turso brain_settings table.
  */
-async function getWhatsAppFallbackReply(message: string): Promise<HiveResponse> {
-  const normalized = message.toLowerCase().trim();
-
-  // 1. Projects, Discovery, Pricing, Estimates, Start Project
-  if (
-    normalized.includes("project planner") ||
-    normalized.includes("planner") ||
-    normalized.includes("start a project") ||
-    normalized.includes("start project") ||
-    normalized.includes("book a call") ||
-    normalized.includes("discovery") ||
-    normalized.includes("quote") ||
-    normalized.includes("budget") ||
-    normalized.includes("price") ||
-    normalized.includes("pricing") ||
-    normalized.includes("cost") ||
-    normalized.includes("estimate")
-  ) {
-    return {
-      reply:
-        "Thanks for reaching out about starting a project with BrandHive Studio!\n\nWe would love to learn more about your vision. To map out scope, timeline, and pricing, you can share a quick summary of what you need right here, or explore our Project Planner at: https://brandhivestudio.com.lk/contact\n\nOur creative director will review your requirements and respond promptly.",
-      needsLeadCapture: true,
-    };
-  }
-
-  // 2. Services, Capabilities, Offerings
-  if (
-    normalized.includes("service") ||
-    normalized.includes("offer") ||
-    normalized.includes("website") ||
-    normalized.includes("web design") ||
-    normalized.includes("branding") ||
-    normalized.includes("logo") ||
-    normalized.includes("marketing") ||
-    normalized.includes("ui/ux") ||
-    normalized.includes("packaging")
-  ) {
-    let serviceList = companyProfile.services;
-    try {
-      const liveServices = await getPublishedServices();
-      if (liveServices && liveServices.length > 0) {
-        serviceList = liveServices.map((s) => s.title);
-      }
-    } catch {
-      // Use companyProfile.services fallback
-    }
-
-    const bullets = serviceList.map((s) => `• ${s}`).join("\n");
-    return {
-      reply: `At BrandHive Studio, we craft premium digital experiences and brand identities. Our core services include:\n\n${bullets}\n\nWould you like more details on a specific service, or shall we discuss a tailored package for your business?`,
-      needsLeadCapture: false,
-    };
-  }
-
-  // 3. Process, Methodology, How We Work
-  if (
-    normalized.includes("process") ||
-    normalized.includes("how it works") ||
-    normalized.includes("how we work") ||
-    normalized.includes("steps") ||
-    normalized.includes("methodology")
-  ) {
-    return {
-      reply:
-        "Our collaborative process follows 5 proven phases:\n\n1. Discovery — Understanding your vision, audience, and goals\n2. Strategy — Positioning, architecture, and creative roadmap\n3. Design — High-fidelity concepts and identity systems\n4. Development — Production-ready build with modern tech\n5. Launch — Thorough testing and seamless deployment\n\nWould you like to schedule an introductory discovery session?",
-      needsLeadCapture: false,
-    };
-  }
-
-  // 4. Contact Details & Team
-  if (
-    normalized.includes("contact") ||
-    normalized.includes("email") ||
-    normalized.includes("phone") ||
-    normalized.includes("call") ||
-    normalized.includes("address") ||
-    normalized.includes("location")
-  ) {
-    return {
-      reply: `You can reach BrandHive Studio directly via WhatsApp at ${companyProfile.contactNumber}, email us at ${companyProfile.email}, or visit our website at ${companyProfile.websiteUrl}.`,
-      needsLeadCapture: false,
-    };
-  }
-
-  // 5. Match CMS FAQs
-  try {
-    const faqs = await getPublishedFaqs();
-    const activeFaqs = faqs && faqs.length > 0 ? faqs : fallbackFaqs;
-    const matchingFaq = activeFaqs.find(
-      (f) =>
-        normalized.includes(f.question.toLowerCase()) ||
-        f.question.toLowerCase().includes(normalized)
-    );
-
-    if (matchingFaq) {
-      return {
-        reply: matchingFaq.answer,
-        needsLeadCapture: false,
-      };
-    }
-  } catch {
-    // Proceed to greeting / general fallback
-  }
-
-  // 6. Greetings & Introductions
-  if (
-    normalized.includes("hello") ||
-    normalized.includes("hi") ||
-    normalized.includes("hey") ||
-    normalized === "hive"
-  ) {
-    return {
-      reply: `Hello! I'm HIVE AI, the digital assistant for BrandHive Studio.\n\nI can help you explore our services, understand our design and development process, or connect you directly with our team to start your project. How can I assist you today?`,
-      needsLeadCapture: false,
-    };
-  }
-
-  // Default Fallback
-  return {
-    reply: `I'm here to assist with BrandHive Studio. I can share details on our branding, website design, and development services, walk through our process, or connect you with our team for a project discovery call. What would you like to explore?`,
-    needsLeadCapture: false,
-  };
-}
-
-// =============================================================================
-// SECTION 2: WEBSITE HIVE AI LOGIC (LIVE SUPABASE KNOWLEDGE INTEGRATION)
-// =============================================================================
-
-/**
- * Retrieve dynamic agency business info for the website from the live Supabase settings table,
- * falling back gracefully if unconfigured or unavailable.
- */
-async function getWebsiteLiveCompanyProfile() {
-  try {
-    const info = await getBusinessInfo();
-    if (info.status === "results" && info.entries.length > 0) {
-      const getVal = (key: string, fallback: string) => {
-        const entry = info.entries.find((e) => e.key === key);
-        return entry && typeof entry.value === "string" ? entry.value : fallback;
-      };
-
-      return {
-        name: getVal("agency_name", companyProfile.name),
-        tagline: getVal("agency_tagline", companyProfile.tagline),
-        contactNumber: getVal("agency_phone", companyProfile.contactNumber),
-        whatsappUrl: getVal("agency_whatsapp", companyProfile.whatsappUrl),
-        email: getVal("agency_email", companyProfile.email),
-        websiteUrl: getVal("agency_website", companyProfile.websiteUrl),
-        process: companyProfile.process,
-      };
-    }
-  } catch {
-    // Fall back gracefully
-  }
-
-  return companyProfile;
+async function getWebsiteLiveCompanyProfile(): Promise<CompanyProfile> {
+  return getBrainCompanyProfile();
 }
 
 /**
@@ -292,6 +120,18 @@ function getRecentTopicContext(
     .join(" ")
     .toLowerCase();
 
+  // Prioritize TikTok first so words like 'video' or 'post' don't trigger social-media
+  if (
+    recent.includes("tiktok") ||
+    recent.includes("tik tok") ||
+    recent.includes("ටක්ටොක්") ||
+    recent.includes("ටික්ටොක්") ||
+    recent.includes("டிக்டாக்") ||
+    recent.includes("டிக் டாக்") ||
+    recent.includes("ttk")
+  ) {
+    return "tiktok";
+  }
   if (
     recent.includes("social media") ||
     recent.includes("facebook") ||
@@ -345,13 +185,6 @@ function getRecentTopicContext(
     return "branding";
   }
   if (
-    recent.includes("tiktok") ||
-    recent.includes("ටික්ටොක්") ||
-    recent.includes("டிக் டாக்")
-  ) {
-    return "tiktok";
-  }
-  if (
     recent.includes("ad") ||
     recent.includes("advertising") ||
     recent.includes("google ads") ||
@@ -381,83 +214,214 @@ function cleanPricingQuery(message: string): string {
 
 /**
  * Select the most relevant services and packages for the customer's query context,
- * drawing authoritatively from the live Supabase catalog.
+ * drawing authoritatively from the live Turso Brain catalog.
+ * Strongly prevents cross-platform package contamination (e.g. returning Facebook packages for TikTok queries).
  */
 function getRelevantServicesContext(
-  services: Service[],
+  services: BrainService[],
   contextQuery: string
 ): string {
   const normalizedQuery = contextQuery.toLowerCase();
 
-  const scored = services.map((s) => {
-    let score = 0;
-    const nameLower = s.name.toLowerCase();
-    const catLower = (s.category || "").toLowerCase();
-    const descLower = (s.description || "").toLowerCase();
+  // 1. Detect if the query specifically targets a platform/channel
+  const isTikTok =
+    normalizedQuery.includes("tiktok") ||
+    normalizedQuery.includes("ටික්ටොක්") ||
+    normalizedQuery.includes("டிக் டாக்") ||
+    normalizedQuery.includes("tik tok") ||
+    normalizedQuery.includes("ttk");
 
-    const words = normalizedQuery.split(/\s+/).filter((w) => w.length >= 3);
-    for (const w of words) {
-      if (nameLower.includes(w)) score += 3;
-      if (catLower.includes(w)) score += 2;
-      if (descLower.includes(w)) score += 1;
-    }
+  const isSocialMedia =
+    !isTikTok &&
+    (normalizedQuery.includes("social media") ||
+      normalizedQuery.includes("facebook") ||
+      normalizedQuery.includes("fb") ||
+      normalizedQuery.includes("instagram") ||
+      normalizedQuery.includes("insta") ||
+      normalizedQuery.includes("smm") ||
+      normalizedQuery.includes("posts") ||
+      normalizedQuery.includes("reels") ||
+      normalizedQuery.includes("සෝෂල්") ||
+      normalizedQuery.includes("සමාජ මාධ්‍ය") ||
+      normalizedQuery.includes("පේජ්") ||
+      normalizedQuery.includes("சோஷியல்") ||
+      normalizedQuery.includes("சமூக"));
 
-    if (
-      s.item_type === "package" &&
-      (normalizedQuery.includes("package") ||
-        normalizedQuery.includes("plan") ||
-        normalizedQuery.includes("how much") ||
-        normalizedQuery.includes("price") ||
-        normalizedQuery.includes("cost") ||
-        normalizedQuery.includes("manage") ||
-        normalizedQuery.includes("run") ||
-        normalizedQuery.includes("monawada") ||
-        normalizedQuery.includes("keeyada") ||
-        normalizedQuery.includes("evlo"))
-    ) {
-      score += 2;
-    }
+  const isWebsite =
+    normalizedQuery.includes("website") ||
+    normalizedQuery.includes("web design") ||
+    normalizedQuery.includes("web development") ||
+    normalizedQuery.includes("ecommerce") ||
+    normalizedQuery.includes("e-commerce") ||
+    normalizedQuery.includes("online store") ||
+    normalizedQuery.includes("landing page") ||
+    normalizedQuery.includes("site") ||
+    normalizedQuery.includes("වෙබ්") ||
+    normalizedQuery.includes("வலைத்தளம்");
 
-    return { service: s, score };
-  });
+  const isBranding =
+    normalizedQuery.includes("branding") ||
+    normalizedQuery.includes("logo") ||
+    normalizedQuery.includes("brand identity") ||
+    normalizedQuery.includes("visual identity") ||
+    normalizedQuery.includes("stationery") ||
+    normalizedQuery.includes("business card") ||
+    normalizedQuery.includes("ලෝගෝ") ||
+    normalizedQuery.includes("බ්‍රෑන්ඩින්") ||
+    normalizedQuery.includes("லோகோ");
 
-  scored.sort((a, b) => b.score - a.score);
+  const isAcademic =
+    normalizedQuery.includes("academic") ||
+    normalizedQuery.includes("student project") ||
+    normalizedQuery.includes("final year") ||
+    normalizedQuery.includes("degree project");
 
-  const topScored = scored
-    .filter((item) => item.score > 0)
-    .slice(0, 15)
-    .map((item) => item.service);
+  let selectedServices: BrainService[] = [];
 
-  let selectedServices: Service[] = [];
-  if (topScored.length >= 4) {
-    selectedServices = topScored;
+  if (isTikTok) {
+    // Specifically prioritize TikTok packages and related services ONLY!
+    // NEVER inject Facebook/Instagram post packages into TikTok queries!
+    const tiktokItems = services.filter(
+      (s) =>
+        s.category === "tiktok" ||
+        s.slug.startsWith("ttk-") ||
+        s.name.toLowerCase().includes("tiktok") ||
+        (s.description && s.description.toLowerCase().includes("tiktok")) ||
+        s.slug === "ads-svc-06" // TikTok Ads Setup
+    );
+
+    tiktokItems.sort((a, b) => {
+      if (a.itemType === "package" && b.itemType !== "package") return -1;
+      if (b.itemType === "package" && a.itemType !== "package") return 1;
+      return (a.price || a.startingPrice || 0) - (b.price || b.startingPrice || 0);
+    });
+
+    selectedServices = tiktokItems;
+  } else if (isSocialMedia) {
+    // Specifically prioritize Social Media / SMM packages
+    const smmItems = services.filter(
+      (s) =>
+        s.category === "social-media" ||
+        s.slug.startsWith("smm-") ||
+        s.slug === "ads-svc-01" ||
+        s.slug === "ads-svc-02"
+    );
+    smmItems.sort((a, b) => {
+      if (a.itemType === "package" && b.itemType !== "package") return -1;
+      if (b.itemType === "package" && a.itemType !== "package") return 1;
+      return (a.price || a.startingPrice || 0) - (b.price || b.startingPrice || 0);
+    });
+    selectedServices = smmItems;
+  } else if (isWebsite) {
+    // Specifically prioritize Website packages and services
+    const webItems = services.filter(
+      (s) =>
+        s.category === "web-development" ||
+        s.category === "website" ||
+        s.slug.startsWith("web-")
+    );
+    webItems.sort((a, b) => {
+      if (a.itemType === "package" && b.itemType !== "package") return -1;
+      if (b.itemType === "package" && a.itemType !== "package") return 1;
+      return (a.price || a.startingPrice || 0) - (b.price || b.startingPrice || 0);
+    });
+    selectedServices = webItems;
+  } else if (isBranding) {
+    // Specifically prioritize Branding packages and services
+    const brdItems = services.filter(
+      (s) =>
+        s.category === "branding" ||
+        s.slug.startsWith("brd-")
+    );
+    brdItems.sort((a, b) => {
+      if (a.itemType === "package" && b.itemType !== "package") return -1;
+      if (b.itemType === "package" && a.itemType !== "package") return 1;
+      return (a.price || a.startingPrice || 0) - (b.price || b.startingPrice || 0);
+    });
+    selectedServices = brdItems;
+  } else if (isAcademic) {
+    const acaItems = services.filter(
+      (s) =>
+        s.category === "academic" ||
+        s.slug.startsWith("aca-")
+    );
+    selectedServices = acaItems;
   } else {
-    // Flagship packages across core categories
-    const coreSlugs = new Set([
-      "brd-pkg-01", "brd-pkg-02", "brd-pkg-03", // Branding packages
-      "web-pkg-01", "web-pkg-02", "web-pkg-03", // Website packages
-      "smm-pkg-01a", "smm-pkg-01b", "smm-pkg-02a", "smm-pkg-03a", // Social Media packages
-    ]);
-    const corePackages = services.filter((s) => coreSlugs.has(s.slug));
+    // Broad or mixed query: score services by keyword relevance
+    const scored = services.map((s) => {
+      let score = 0;
+      const nameLower = s.name.toLowerCase();
+      const catLower = (s.category || "").toLowerCase();
+      const descLower = (s.description || "").toLowerCase();
 
-    const combined = [...topScored];
-    for (const cp of corePackages) {
-      if (!combined.some((s) => s.id === cp.id)) {
-        combined.push(cp);
+      const words = normalizedQuery.split(/\s+/).filter((w) => w.length >= 3);
+      for (const w of words) {
+        if (nameLower.includes(w)) score += 3;
+        if (catLower.includes(w)) score += 2;
+        if (descLower.includes(w)) score += 1;
       }
+
+      if (s.itemType === "package") {
+        score += 2;
+      }
+
+      return { service: s, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+
+    const topScored = scored
+      .filter((item) => item.score > 0)
+      .slice(0, 15)
+      .map((item) => item.service);
+
+    if (topScored.length >= 5) {
+      selectedServices = topScored;
+    } else {
+      // Flagship packages across ALL core categories (including TikTok!)
+      const flagshipSlugs = new Set([
+        "brd-pkg-01", "brd-pkg-02", "brd-pkg-03", // Branding
+        "web-pkg-01", "web-pkg-02", "web-pkg-03", // Website
+        "smm-pkg-01a", "smm-pkg-02a", "smm-pkg-03a", // Social Media
+        "ttk-pkg-01", "ttk-pkg-02", "ttk-pkg-03", // TikTok
+      ]);
+      const flagships = services.filter((s) => flagshipSlugs.has(s.slug));
+
+      const combined = [...topScored];
+      for (const fp of flagships) {
+        if (!combined.some((s) => s.id === fp.id)) {
+          combined.push(fp);
+        }
+      }
+      selectedServices = combined.slice(0, 20);
     }
-    selectedServices = combined.slice(0, 18);
   }
 
   return selectedServices
     .map((s) => {
-      const priceDisplay = formatPriceDisplay(s);
-      const metadata = (s.metadata ?? {}) as Record<string, unknown>;
-      const inclusions =
-        Array.isArray(metadata.inclusions) && metadata.inclusions.length > 0
-          ? ` | Includes: ${(metadata.inclusions as string[]).slice(0, 3).join(", ")}`
-          : "";
-      return `- ${s.name} [${s.category || "General"}] (${s.item_type}): ${priceDisplay}${inclusions}`;
+      const priceDisplay = formatBrainPriceDisplay(s);
+      let inclusionsText = "";
+      try {
+        if (s.inclusions) {
+          const arr = JSON.parse(s.inclusions);
+          if (Array.isArray(arr) && arr.length > 0) {
+            inclusionsText = ` | Includes: ${arr.slice(0, 4).join(", ")}`;
+          }
+        }
+      } catch {}
+
+      let categoryLabel = s.category;
+      if (s.category === "tiktok" || s.slug.startsWith("ttk-")) {
+        categoryLabel = "TikTok Video Package";
+      } else if (s.category === "social-media") {
+        categoryLabel = "Social Media (Facebook/Instagram)";
+      } else if (s.category === "website") {
+        categoryLabel = "Website Development";
+      } else if (s.category === "branding") {
+        categoryLabel = "Brand Identity";
+      }
+
+      return `- [${categoryLabel}] ${s.name} (${s.itemType}): ${priceDisplay}${inclusionsText}`;
     })
     .join("\n");
 }
@@ -577,6 +541,8 @@ async function getWebsiteFallbackReply(
   const normalized = message.toLowerCase().trim();
   const profile = await getWebsiteLiveCompanyProfile();
   const recentTopic = getRecentTopicContext(history);
+  const currentTopic = getRecentTopicContext([{ role: "user", content: message }]);
+  const effectiveTopic = recentTopic || currentTopic;
   const langStyle = detectLanguageStyle(message, history);
 
   // 1. Inexperienced / Non-Technical Customer Statements
@@ -630,7 +596,7 @@ async function getWebsiteFallbackReply(
 
   // 2. Contextual & Referential Follow-ups across languages
   if (isReferentialMessage(normalized)) {
-    if (recentTopic === "social-media") {
+    if (effectiveTopic === "social-media") {
       // Questions about reels
       if (
         normalized.includes("reels") ||
@@ -885,7 +851,7 @@ async function getWebsiteFallbackReply(
       };
     }
 
-    if (recentTopic === "website") {
+    if (effectiveTopic === "website") {
       if (langStyle === "singlish") {
         return {
           reply: "Sure 😊 Website packages 3k thiyenawa:\n\n• Starter Website (LKR 35,000 indala) — Pages 5k, mobile-friendly.\n• Business Website (LKR 75,000 indala) — Pages 10k, full management ekka.\n• Corporate (LKR 150,000 indala) — Custom built platform ekak.\n\nOyalata aluth website ekakda one?",
@@ -921,7 +887,7 @@ async function getWebsiteFallbackReply(
       };
     }
 
-    if (recentTopic === "branding") {
+    if (effectiveTopic === "branding") {
       if (langStyle === "singlish") {
         return {
           reply: "Sure 😊 Branding packages thiyenawa:\n\n• Standalone Logo (LKR 8,000 indala) — Logo design concepts.\n• Starter Brand Identity (LKR 15,000 indala) — Logo, color palette, fonts.\n• Business Brand Identity (LKR 35,000 indala) — Complete identity saha stationery.\n\nAluth logo ekak hadaganna kemathida?",
@@ -954,6 +920,176 @@ async function getWebsiteFallbackReply(
         reply: "Sure 😊 Our branding packages include:\n\n• Standalone Logo Design (from LKR 8,000) — Custom logo concepts.\n• Starter Brand Identity (from LKR 15,000) — Logo design, color palette, and typography system.\n• Business Brand Identity (from LKR 35,000) — Full visual identity, stationery, and social media branding kit.\n\nWould you like a brand-new identity or a logo refresh?",
         needsLeadCapture: false,
         suggestedAction: "Ask about branding packages",
+      };
+    }
+
+    if (effectiveTopic === "tiktok") {
+      // Questions about first / starter
+      if (
+        normalized.includes("first") ||
+        normalized.includes("palaweni") ||
+        normalized.includes("palawani") ||
+        normalized.includes("starter") ||
+        normalized.includes("single") ||
+        normalized.includes("පළවෙනි") ||
+        normalized.includes("முதல்")
+      ) {
+        if (langStyle === "singlish") {
+          return {
+            reply: "Starter TikTok package eka LKR 5,500 wenawa 😊 Single on-location shoot video ekak, editing, captions, and uploads okkoma api karala denawa.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter TikTok video",
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: "Starter TikTok package එක LKR 5,500 වෙනවා 😊 තනි වීඩියෝවක් location එකට ඇවිත් shoot කරලා, edit කරලා, upload කරලා දෙනවා.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter TikTok video",
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: "Starter TikTok package LKR 5,500 varum 😊 1 video on-location shoot panni, edit panni, captions and upload ellame nanga panrom.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter TikTok video",
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: "Starter TikTok package LKR 5,500 வரும் 😊 1 video on-location shoot செய்து, edit செய்து, upload செய்து தருவோம்.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter TikTok video",
+          };
+        }
+        return {
+          reply: "Our Starter TikTok package is LKR 5,500 for a single video 😊 It includes client-location shoot, professional editing, captions, and upload.",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about Starter TikTok video",
+        };
+      }
+
+      // Second / Growth
+      if (
+        normalized.includes("second") ||
+        normalized.includes("deweni") ||
+        normalized.includes("growth") ||
+        normalized.includes("4 video") ||
+        normalized.includes("දෙවෙනි") ||
+        normalized.includes("இரண்டாவது")
+      ) {
+        if (langStyle === "singlish") {
+          return {
+            reply: "Growth TikTok package eka LKR 18,000/month wenawa 😊 Monthly videos 4k, on-location shooting, editing, captions, uploads, saha content planning labenawa.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Growth TikTok package",
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: "Growth TikTok package එක මාසෙකට LKR 18,000 වෙනවා 😊 වීඩියෝ 4ක්, on-location shoot, professional editing, captions, සහ monthly content planning ඇතුළත්.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Growth TikTok package",
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: "Growth TikTok package LKR 18,000/month varum 😊 4 videos, on-location shooting, editing, captions, uploads, and monthly planning ellame irukku.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Growth TikTok package",
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: "Growth TikTok package மாதத்திற்கு LKR 18,000 வரும் 😊 4 videos, on-location shooting, editing, captions மற்றும் planning அடங்கும்.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Growth TikTok package",
+          };
+        }
+        return {
+          reply: "Our Growth TikTok package is LKR 18,000/month for 4 videos 😊 Includes on-location shooting, editing, captions, uploads, and monthly content planning.",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about Growth TikTok package",
+        };
+      }
+
+      // Third / Premium
+      if (
+        normalized.includes("third") ||
+        normalized.includes("thunweni") ||
+        normalized.includes("premium") ||
+        normalized.includes("8 video") ||
+        normalized.includes("තුන්වෙනි") ||
+        normalized.includes("மூன்றாவது")
+      ) {
+        if (langStyle === "singlish") {
+          return {
+            reply: "Premium TikTok package eka LKR 32,000/month wenawa 😊 Promotional videos 8k, on-location shoot, professional editing, captions, uploads, and optimization okkoma labenawa.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Premium TikTok package",
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: "Premium TikTok package එක මාසෙකට LKR 32,000 වෙනවා 😊 ප්‍රවර්ධන වීඩියෝ 8ක්, on-location shoot, professional editing, captions, uploads, සහ optimization ඇතුළත්.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Premium TikTok package",
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: "Premium TikTok package LKR 32,000/month varum 😊 8 promotional videos, on-location shoot, professional editing, captions, uploads, and optimization ellame irukku.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Premium TikTok package",
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: "Premium TikTok package மாதத்திற்கு LKR 32,000 வரும் 😊 8 promotional videos, on-location shoot, editing, captions மற்றும் upload அடங்கும்.",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Premium TikTok package",
+          };
+        }
+        return {
+          reply: "Our Premium TikTok package is LKR 32,000/month for 8 videos 😊 Includes on-location shooting, promotional concepts, professional editing, and optimization.",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about Premium TikTok package",
+        };
+      }
+
+      // Default TikTok package overview
+      if (langStyle === "singlish") {
+        return {
+          reply: "Sure 😊 TikTok video packages 3k thiyenawa:\n\n• Starter (LKR 5,500) — Single on-location shoot video\n• Growth (LKR 18,000/mo) — 4 videos, shoot, edit, captions & planning\n• Premium (LKR 32,000/mo) — 8 videos full promotional package\n\nMewayin oyalage business ekata galapena eka balamuda?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok packages",
+        };
+      }
+      if (langStyle === "sinhala") {
+        return {
+          reply: "Sure 😊 අපේ TikTok packages 3ක් තියෙනවා:\n\n• Starter (LKR 5,500) — තනි වීඩියෝවක් (on-location shoot, edit, upload)\n• Growth (LKR 18,000/මසකට) — වීඩියෝ 4ක් (shoot, editing, planning)\n• Premium (LKR 32,000/මසකට) — වීඩියෝ 8ක් (promotional concepts, shoot & edit)\n\nඔබගේ ව්‍යාපාරයට ගැලපෙන package එක බලමුද?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok packages",
+        };
+      }
+      if (langStyle === "tanglish") {
+        return {
+          reply: "Sure 😊 TikTok video packages irukku:\n\n• Starter (LKR 5,500) — 1 on-location video with shoot & edit\n• Growth (LKR 18,000/mo) — 4 videos with monthly planning\n• Premium (LKR 32,000/mo) — 8 videos with full promotional concepts\n\nUnga business-ku edhu suit aagum nu paakkalaama?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok packages",
+        };
+      }
+      if (langStyle === "tamil") {
+        return {
+          reply: "Sure 😊 எங்களிடம் TikTok video packages உள்ளன:\n\n• Starter (LKR 5,500) — 1 on-location video (shoot & edit)\n• Growth (LKR 18,000/மாதம்) — 4 videos with content planning\n• Premium (LKR 32,000/மாதம்) — 8 videos with promotional production\n\nஎந்த package பார்க்க விரும்புகிறீர்கள்?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok packages",
+        };
+      }
+      return {
+        reply: "Sure 😊 We have 3 dedicated TikTok video packages:\n\n• Starter (LKR 5,500) — Single on-location shoot video with professional editing & upload.\n• Growth (LKR 18,000/month) — 4 monthly videos with on-location shooting, captions & planning.\n• Premium (LKR 32,000/month) — 8 high-impact promotional videos with optimization.\n\nWhich of these would you like to explore for your brand?",
+        needsLeadCapture: false,
+        suggestedAction: "Ask about TikTok packages",
       };
     }
 
@@ -1006,7 +1142,7 @@ async function getWebsiteFallbackReply(
       normalized.includes("insta") ||
       normalized.includes("சோஷியல்") ||
       normalized.includes("சமூக") ||
-      (recentTopic === "social-media" && !normalized.includes("website") && !normalized.includes("brand"))
+      (effectiveTopic === "social-media" && !normalized.includes("website") && !normalized.includes("brand"))
     ) {
       if (langStyle === "singlish") {
         return {
@@ -1152,7 +1288,7 @@ async function getWebsiteFallbackReply(
     normalized === "எவ்வளவு?" ||
     normalized === "எவ்வளவு"
   ) {
-    if (recentTopic === "social-media") {
+    if (effectiveTopic === "social-media") {
       if (langStyle === "singlish") {
         return {
           reply: "Sure — oya ahanne social media packages gana neda? Ape packages LKR 14,000/month indala thiyenawa 😊",
@@ -1187,7 +1323,7 @@ async function getWebsiteFallbackReply(
         suggestedAction: "View social media pricing",
       };
     }
-    if (recentTopic === "website") {
+    if (effectiveTopic === "website") {
       if (langStyle === "singlish") {
         return {
           reply: "Sure — website packages gana neda? Starter website ekak LKR 35,000 indala thiyenawa 😊",
@@ -1222,7 +1358,7 @@ async function getWebsiteFallbackReply(
         suggestedAction: "View website pricing",
       };
     }
-    if (recentTopic === "branding") {
+    if (effectiveTopic === "branding") {
       if (langStyle === "singlish") {
         return {
           reply: "Sure — branding packages gana neda? Standalone logo design LKR 8,000 indala, full identity LKR 15,000 indala thiyenawa 😊",
@@ -1250,6 +1386,41 @@ async function getWebsiteFallbackReply(
         suggestedAction: "View branding pricing",
       };
     }
+    if (effectiveTopic === "tiktok") {
+      if (langStyle === "singlish") {
+        return {
+          reply: "Sure — TikTok video packages gana neda? Starter package eka LKR 5,500 indala, Growth package (4 videos) LKR 18,000/month wenawa 😊",
+          needsLeadCapture: false,
+          suggestedAction: "View TikTok pricing",
+        };
+      }
+      if (langStyle === "sinhala") {
+        return {
+          reply: "Sure — ඔබ අහන්නේ TikTok packages ගැන නේද? Starter එක LKR 5,500 සිට සහ Growth package (වීඩියෝ 4ක්) මාසෙකට LKR 18,000 වෙනවා 😊",
+          needsLeadCapture: false,
+          suggestedAction: "View TikTok pricing",
+        };
+      }
+      if (langStyle === "tanglish") {
+        return {
+          reply: "Sure — TikTok packages pathi kekkareengala? Starter package LKR 5,500 la irundhu, Growth package LKR 18,000/month varum 😊",
+          needsLeadCapture: false,
+          suggestedAction: "View TikTok pricing",
+        };
+      }
+      if (langStyle === "tamil") {
+        return {
+          reply: "Sure — TikTok packages பற்றி கேக்கறீங்களா? Starter package LKR 5,500 முதல் மற்றும் Growth package மாதத்திற்கு LKR 18,000 வரும் 😊",
+          needsLeadCapture: false,
+          suggestedAction: "View TikTok pricing",
+        };
+      }
+      return {
+        reply: "Sure — do you mean the TikTok video packages we were just talking about? Starter starts from LKR 5,500, and Growth (4 videos/month) is LKR 18,000/month.",
+        needsLeadCapture: false,
+        suggestedAction: "View TikTok pricing",
+      };
+    }
     return {
       reply: "Sure! Which service or project would you like pricing for?",
       needsLeadCapture: false,
@@ -1257,7 +1428,7 @@ async function getWebsiteFallbackReply(
     };
   }
 
-  // 5. Specific Pricing / Cost / Quote Lookups from live Supabase
+  // 5. Specific Pricing / Cost / Quote Lookups from live Turso Brain
   const isPricingIntent =
     normalized.includes("price") ||
     normalized.includes("pricing") ||
@@ -1269,6 +1440,8 @@ async function getWebsiteFallbackReply(
     normalized.includes("budget") ||
     normalized.includes("starting from") ||
     normalized.includes("fee") ||
+    normalized.includes("package") ||
+    normalized.includes("packages") ||
     normalized.includes("keeyada") ||
     normalized.includes("ganan") ||
     normalized.includes("evlo") ||
@@ -1276,13 +1449,60 @@ async function getWebsiteFallbackReply(
     normalized.includes("කීයද") ||
     normalized.includes("ගණන්") ||
     normalized.includes("මිල") ||
+    normalized.includes("පැකේජ") ||
+    normalized.includes("පැකේජ්") ||
     normalized.includes("எவ்வளவு") ||
-    normalized.includes("விலை");
+    normalized.includes("விலை") ||
+    normalized.includes("பேக்கேஜ்");
 
   if (isPricingIntent) {
     let serviceSearchTerm = cleanPricingQuery(normalized);
-    if (serviceSearchTerm.length < 2 && recentTopic) {
-      serviceSearchTerm = recentTopic.replace("-", " ");
+    if (serviceSearchTerm.length < 2 && effectiveTopic) {
+      serviceSearchTerm = effectiveTopic.replace("-", " ");
+    }
+
+    // Direct match for TikTok video packages pricing
+    if (
+      serviceSearchTerm.includes("tiktok") ||
+      serviceSearchTerm.includes("tik tok") ||
+      serviceSearchTerm.includes("ටක්ටොක්") ||
+      serviceSearchTerm.includes("ටික්ටොක්") ||
+      serviceSearchTerm.includes("டிக்டாக்") ||
+      serviceSearchTerm.includes("டிக் டாக்")
+    ) {
+      if (langStyle === "singlish") {
+        return {
+          reply: "Sure 😊 Ape TikTok video packages LKR 5,500 (Starter - single video) indala LKR 32,000/month (Premium - 8 videos) wenakam thiyenawa. Extra video add-ons LKR 5,000 wenawa. Oyalata one details tika mama kiyannada?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok package details",
+        };
+      }
+      if (langStyle === "tanglish") {
+        return {
+          reply: "Sure 😊 Namma TikTok video packages LKR 5,500 (Starter - 1 video) la irundhu LKR 32,000/month (Premium - 8 videos) varaikkum irukku. Extra video add-ons LKR 5,000 varum. Ungalukku enna theva nu sonnaa correct package solren.",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok package details",
+        };
+      }
+      if (langStyle === "sinhala") {
+        return {
+          reply: "අපේ TikTok video packages LKR 5,500 (Starter - තනි වීඩියෝවක්) සිට LKR 32,000/මසකට (Premium - වීඩියෝ 8ක්) දක්වා තියෙනවා 😊 Extra video add-on එක LKR 5,000 වෙනවා. විස්තර කියන්නද?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok package details",
+        };
+      }
+      if (langStyle === "tamil") {
+        return {
+          reply: "எங்க TikTok video packages LKR 5,500 (Starter - 1 video) முதல் LKR 32,000/மாதம் (Premium - 8 videos) வரை இருக்கு 😊 Extra video add-on LKR 5,000 வரும். விவரங்கள் சொல்லவா?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about TikTok package details",
+        };
+      }
+      return {
+        reply: "Sure 😊 Our TikTok packages start from LKR 5,500 (Starter — 1 video with shoot & editing), LKR 18,000/month for Growth (4 videos), and LKR 32,000/month for Premium (8 videos). Extra video add-ons are LKR 5,000 each. Would you like details on what's included?",
+        needsLeadCapture: false,
+        suggestedAction: "Ask about TikTok package details",
+      };
     }
 
     // Direct match for social media pricing
@@ -1332,45 +1552,46 @@ async function getWebsiteFallbackReply(
 
     if (serviceSearchTerm.length >= 2) {
       try {
-        const pricingResult = await getServicePricing(serviceSearchTerm);
+        const pricingResult = await getBrainServicePricing(serviceSearchTerm);
 
         if (pricingResult.status === "match") {
-          const s: ServicePricingDetail = pricingResult.service;
+          const s = pricingResult.service;
+          const displayPrice = pricingResult.displayPrice;
           const inclusionsText =
-            s.inclusions && s.inclusions.length > 0
-              ? ` It includes: ${s.inclusions.slice(0, 3).join(", ")}.`
+            pricingResult.inclusions && pricingResult.inclusions.length > 0
+              ? ` It includes: ${pricingResult.inclusions.slice(0, 3).join(", ")}.`
               : "";
 
           if (langStyle === "singlish") {
             return {
-              reply: `Sure 😊 Ape ${s.name} eka ${s.display_price} wenawa.${inclusionsText} Mewaye thawa details kiyannada?`,
+              reply: `Sure 😊 Ape ${s.name} eka ${displayPrice} wenawa.${inclusionsText} Mewaye thawa details kiyannada?`,
               needsLeadCapture: false,
               suggestedAction: "Ask about package inclusions",
             };
           }
           if (langStyle === "sinhala") {
             return {
-              reply: `Sure 😊 අපේ ${s.name} එක ${s.display_price} වෙනවා.${inclusionsText} වැඩි විස්තර දැනගන්න කැමතිද?`,
+              reply: `Sure 😊 අපේ ${s.name} එක ${displayPrice} වෙනවා.${inclusionsText} වැඩි විස්තර දැනගන්න කැමතිද?`,
               needsLeadCapture: false,
               suggestedAction: "Ask about package inclusions",
             };
           }
           if (langStyle === "tanglish") {
             return {
-              reply: `Sure 😊 Namma ${s.name} ${s.display_price} varum.${inclusionsText} Idhoda details sollatumaa?`,
+              reply: `Sure 😊 Namma ${s.name} ${displayPrice} varum.${inclusionsText} Idhoda details sollatumaa?`,
               needsLeadCapture: false,
               suggestedAction: "Ask about package inclusions",
             };
           }
           if (langStyle === "tamil") {
             return {
-              reply: `Sure 😊 எங்கள் ${s.name} ${s.display_price} வரும்.${inclusionsText} விவரங்கள் சொல்லவா?`,
+              reply: `Sure 😊 எங்கள் ${s.name} ${displayPrice} வரும்.${inclusionsText} விவரங்கள் சொல்லவா?`,
               needsLeadCapture: false,
               suggestedAction: "Ask about package inclusions",
             };
           }
           return {
-            reply: `Sure 😊 Our ${s.name} is ${s.display_price}.${inclusionsText} Want me to share more details on what's included?`,
+            reply: `Sure 😊 Our ${s.name} is ${displayPrice}.${inclusionsText} Want me to share more details on what's included?`,
             needsLeadCapture: false,
             suggestedAction: "Ask about package inclusions",
           };
@@ -1385,10 +1606,17 @@ async function getWebsiteFallbackReply(
           };
         }
 
-        // Try fuzzy search if getServicePricing didn't resolve
-        const searchRes = await searchServices(serviceSearchTerm, 3);
-        if (searchRes.status === "results" && searchRes.matches.length > 0) {
-          const optionsText = searchRes.matches.map((m) => m.name).join(", ");
+        // Try search across active brain services if getBrainServicePricing didn't resolve
+        const allServices = await fetchActiveBrainServices();
+        const searchWords = serviceSearchTerm.split(/\s+/).filter((w) => w.length >= 3);
+        const matches = allServices.filter((s) => {
+          const n = s.name.toLowerCase();
+          const d = (s.description || "").toLowerCase();
+          return searchWords.some((w) => n.includes(w) || d.includes(w));
+        }).slice(0, 3);
+
+        if (matches.length > 0) {
+          const optionsText = matches.map((m) => m.name).join(", ");
           return {
             reply: `Sure 😊 For that, we offer: ${optionsText}. Which one would you like pricing and details on?`,
             needsLeadCapture: false,
@@ -1463,7 +1691,7 @@ async function getWebsiteFallbackReply(
     };
   }
 
-  // 7. Add-ons Inquiry from live Supabase
+  // 7. Add-ons Inquiry from live Turso Brain
   if (
     normalized.includes("add-on") ||
     normalized.includes("addon") ||
@@ -1472,11 +1700,11 @@ async function getWebsiteFallbackReply(
     normalized.includes("extension")
   ) {
     try {
-      const addonResult = await listAddons();
-      if (addonResult.status === "results" && addonResult.addons.length > 0) {
-        const topAddons = addonResult.addons.slice(0, 4);
+      const addons = await fetchActiveBrainAddons();
+      if (addons.length > 0) {
+        const topAddons = addons.slice(0, 4);
         const listText = topAddons
-          .map((a) => `${a.name} (${a.display_price})`)
+          .map((a) => `${a.name} (${formatBrainPriceDisplay(a)})`)
           .join(", ");
         return {
           reply: `Sure 😊 We provide extra add-ons including: ${listText}. Would you like to add any of these to your package?`,
@@ -1489,11 +1717,11 @@ async function getWebsiteFallbackReply(
     }
   }
 
-  // 7. Authoritative FAQs from live Supabase (Protected against generic words and low confidence)
+  // 7. Authoritative FAQs from live Turso Brain (Protected against generic words and low confidence)
   try {
-    const faqResult = await searchFaqs(message, 1);
-    if (faqResult.status === "results" && faqResult.matches.length > 0) {
-      const match = faqResult.matches[0];
+    const matchedFaqs = await searchBrainFaqs(message, 1);
+    if (matchedFaqs.length > 0) {
+      const match = matchedFaqs[0];
       return {
         reply: match.answer,
         needsLeadCapture: false,
@@ -1501,7 +1729,7 @@ async function getWebsiteFallbackReply(
       };
     }
   } catch {
-    // Fall back to CMS FAQs if Supabase query encounters issues
+    // Fall back to CMS FAQs if Turso Brain query encounters issues
   }
 
   // CMS FAQs fallback (requires substantial question keyword overlap)
@@ -1548,10 +1776,15 @@ async function getWebsiteFallbackReply(
     normalized.includes("services enna")
   ) {
     try {
-      const searchRes = await searchServices(message, 3);
-      if (searchRes.status === "results" && searchRes.matches.length > 0) {
+      const allServices = await fetchActiveBrainServices();
+      const queryWords = message.toLowerCase().split(/\s+/).filter((w) => w.length >= 3);
+      const matches = allServices.filter((s) => {
+        const n = s.name.toLowerCase();
+        return queryWords.some((w) => n.includes(w));
+      }).slice(0, 3);
+      if (matches.length > 0) {
         return {
-          reply: `We offer ${searchRes.matches.map((s) => s.name).join(", ")} 😊 Would you like to see package prices or what's included?`,
+          reply: `We offer ${matches.map((s) => s.name).join(", ")} 😊 Would you like to see package prices or what's included?`,
           needsLeadCapture: false,
           suggestedAction: "Ask for pricing",
         };
@@ -1713,30 +1946,123 @@ async function getWebsiteFallbackReply(
 }
 
 // =============================================================================
-// SECTION 3: ENTRY POINTS
+// ENTRY POINTS
 // =============================================================================
 
 /**
- * Route message to either WhatsApp fallback or Website live Supabase fallback.
+ * Route message to Website fallback knowledge engine.
  */
 export async function getFallbackReply(
   message: string,
-  channel: "web" | "whatsapp" = "web",
+  _channel: string = "web",
   history: Array<{ role: "assistant" | "user"; content: string }> = []
 ): Promise<HiveResponse> {
-  if (channel === "whatsapp") {
-    return getWhatsAppFallbackReply(message);
-  }
   return getWebsiteFallbackReply(message, history);
 }
 
+// =============================================================================
+// EXPORTED GEMINI CALL PRIMITIVE
+// =============================================================================
+// GeminiCallResult and callGeminiEndpoint are exported so that focused tests can
+// exercise the REAL production Gemini request logic with a mock fetch function,
+// without needing a live Turso/DB connection or real API credentials.
+// The production processHiveMessage function delegates its Gemini calls through
+// this exported function.
+
+export type GeminiCallResult = {
+  ok: boolean;          // true only when HTTP 200 and non-empty text was extracted
+  httpStatus: number;   // raw HTTP status (0 = network/fetch exception)
+  text: string;         // extracted text from candidates[0].content.parts[0].text
+  finishReason: string; // finishReason from first candidate (empty string if absent)
+  fetchError?: string;  // message from a thrown fetch exception
+};
+
+/** Subset of fetch options needed by callGeminiEndpoint */
+type FetchLike = (url: string, init: RequestInit) => Promise<Response>;
+
 /**
- * Main HIVE AI processor.
- * - When channel is "whatsapp": Executes original, unchanged WhatsApp AI behavior.
- * - When channel is "web": Executes Website HIVE AI grounded in live Supabase knowledge.
+ * Core Gemini REST call primitive — exported for testing.
+ * The production processHiveMessage closure calls this function so tests can
+ * inject a mock fetch and exercise the REAL parsing and empty-response logic.
+ *
+ * thinkingConfig policy:
+ *  - Omitted for non-thinking models (e.g. gemini-3.8-flash) — sending it causes
+ *    empty candidates (confirmed root cause of the original empty-output error).
+ *  - gemini-2.5-* variants receive thinkingBudget: 0 to disable thinking mode.
+ */
+export async function callGeminiEndpoint(
+  targetModel: string,
+  apiKey: string,
+  systemPrompt: string,
+  geminiContents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }>,
+  fetchFn: FetchLike = fetch
+): Promise<GeminiCallResult> {
+  const cleanModel = targetModel.trim().replace(/^["']|["']$/g, "").replace(/^models\//, "");
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(cleanModel)}:generateContent`;
+
+  const isThinkingModel =
+    cleanModel.startsWith("gemini-2.5") ||
+    cleanModel.includes("thinking") ||
+    cleanModel === "gemini-flash-latest";
+
+  const generationConfig: Record<string, unknown> = {
+    temperature: 0.7,
+    responseMimeType: "application/json",
+  };
+  if (isThinkingModel) {
+    generationConfig.thinkingConfig = { thinkingBudget: 0 };
+  }
+
+  try {
+    const res = await fetchFn(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: geminiContents,
+        generationConfig,
+      }),
+    });
+
+    if (!res.ok) {
+      console.warn(`[HIVE AI] Model "${cleanModel}" HTTP ${res.status}.`);
+      return { ok: false, httpStatus: res.status, text: "", finishReason: "" };
+    }
+
+    const data = await res.json();
+    const candidate = data?.candidates?.[0];
+    const finishReason: string = candidate?.finishReason ?? "";
+    const text: string = candidate?.content?.parts?.[0]?.text ?? "";
+    const hasUsableText = typeof text === "string" && text.trim().length > 0;
+
+    if (!hasUsableText) {
+      console.warn(
+        `[HIVE AI] Model "${cleanModel}" returned no usable text.`,
+        `HTTP ${res.status} | finishReason: ${finishReason || "(absent)"}`,
+        `candidateCount: ${data?.candidates?.length ?? 0}`,
+        data?.promptFeedback?.blockReason
+          ? `| promptBlocked: ${data.promptFeedback.blockReason}`
+          : ""
+      );
+      return { ok: false, httpStatus: res.status, text: "", finishReason };
+    }
+
+    return { ok: true, httpStatus: res.status, text, finishReason };
+  } catch (err) {
+    const fetchError = err instanceof Error ? err.message : "Network error";
+    console.warn(`[HIVE AI] Model "${cleanModel}" fetch threw: ${fetchError}`);
+    return { ok: false, httpStatus: 0, text: "", finishReason: "", fetchError };
+  }
+}
+
+/**
+ * Main HIVE AI processor for BrandHive Studio Website.
  */
 export async function processHiveMessage(options: HiveMessageOptions): Promise<HiveResponse> {
-  const { message, history = [], channel = "web" } = options;
+  const { message, history = [] } = options;
   const apiKey = process.env.GEMINI_API_KEY;
 
   const formattedHistory: Array<{ role: "assistant" | "user"; content: string }> = history.map((entry) => ({
@@ -1745,36 +2071,28 @@ export async function processHiveMessage(options: HiveMessageOptions): Promise<H
   }));
 
   if (!apiKey) {
-    return getFallbackReply(message, channel, formattedHistory);
+    return getFallbackReply(message, "web", formattedHistory);
   }
 
   try {
-    const isWhatsApp = channel === "whatsapp";
+    // WEBSITE HIVE AI: Live Turso Brain services & LKR pricing context with multilingual intelligence
+    const [profile, activeServices] = await Promise.all([
+      getWebsiteLiveCompanyProfile(),
+      fetchActiveBrainServices().catch(() => [] as BrainService[]),
+    ]);
+    const detectedLang = detectLanguageStyle(message, formattedHistory);
 
-    let systemPrompt: string;
+    let servicesContext = "";
+    if (activeServices.length > 0) {
+      const contextQuery = [
+        message,
+        ...history.slice(-3).map((h) => h.content),
+      ].join(" ");
+      servicesContext = getRelevantServicesContext(activeServices, contextQuery);
+    }
 
-    if (isWhatsApp) {
-      // STRICTLY PRESERVED: Original WhatsApp prompt without Supabase alterations
-      systemPrompt = `You are HIVE AI, the official AI concierge for BrandHive Studio on WhatsApp (+94 70 641 0093). BrandHive Studio is a premium branding, UI/UX, and web development agency. Keep answers concise, helpful, and formatted naturally for WhatsApp reading. Use clean line breaks. Return valid JSON with keys: reply, needsLeadCapture.`;
-    } else {
-      // WEBSITE HIVE AI: Live Supabase services & LKR pricing context with multilingual intelligence
-      const [profile, activeServices] = await Promise.all([
-        getWebsiteLiveCompanyProfile(),
-        fetchActiveServices().catch(() => [] as Service[]),
-      ]);
-      const detectedLang = detectLanguageStyle(message, formattedHistory);
-
-      let servicesContext = "";
-      if (activeServices.length > 0) {
-        const contextQuery = [
-          message,
-          ...history.slice(-3).map((h) => h.content),
-        ].join(" ");
-        servicesContext = getRelevantServicesContext(activeServices, contextQuery);
-      }
-
-      const langDirectiveMap: Record<LanguageStyle, string> = {
-        singlish: `TARGET LANGUAGE/STYLE: SINGLISH (Sinhala written in English/Roman letters).
+    const langDirectiveMap: Record<LanguageStyle, string> = {
+      singlish: `TARGET LANGUAGE/STYLE: SINGLISH (Sinhala written in English/Roman letters).
 - MUST reply in natural, friendly Sri Lankan colloquial Singlish.
 - Use natural Romanized Sinhala phrasing (e.g. "Ow 😊", "Api oyage social media manage karanna puluwan", "Posts hadala, schedule karala okkoma api balagannam", "Packages tika balamuda?", "thiyenawa").
 - Standard English business terms can remain in English where natural (e.g. "social media", "posts", "reels", "package", "Starter", "Growth", "Premium", "website", "branding").
@@ -1782,27 +2100,27 @@ export async function processHiveMessage(options: HiveMessageOptions): Promise<H
 - STRICT PROHIBITION: Do NOT output Sinhala Unicode script unless the user mixed Sinhala script into their message.
 - Keep the grammar and rhythm natural to everyday Sri Lankan chat.`,
 
-        sinhala: `TARGET LANGUAGE/STYLE: SINHALA SCRIPT (සිංහල).
+      sinhala: `TARGET LANGUAGE/STYLE: SINHALA SCRIPT (සිංහල).
 - MUST reply in natural, welcoming Sinhala script (e.g. "ඔව් 😊 අපි ඔබගේ social media manage කරලා දෙන්න පුළුවන්. Content හදලා, posts schedule කරලා ඔක්කොම අපි බලාගන්නවා. Packages ටික බලමුද?").
 - Common loan terms ("social media", "website", "branding", "posts", "reels", "packages", "Starter", "Growth", "Premium") may remain in English script where appropriate.
 - STRICT PROHIBITION: NEVER reply in English when the user communicates in Sinhala script.
 - STRICT PROHIBITION: NEVER use Tamil words or script.`,
 
-        tanglish: `TARGET LANGUAGE/STYLE: TANGLISH (Tamil written in English/Roman letters).
+      tanglish: `TARGET LANGUAGE/STYLE: TANGLISH (Tamil written in English/Roman letters).
 - MUST reply in natural, friendly colloquial Tanglish (e.g. "Aamanga 😊 Nanga unga social media manage pannuvom. Content design, post scheduling ellame nanga pathukkuvom. Packages paakkalaama?").
 - Standard English business terms can remain ("social media", "posts", "reels", "packages").
 - STRICT PROHIBITION: NEVER use Sinhala words (such as "karanawa", "monawada", "keeyada", "puluwan", "ayubowan").`,
 
-        tamil: `TARGET LANGUAGE/STYLE: TAMIL SCRIPT (தமிழ்).
+      tamil: `TARGET LANGUAGE/STYLE: TAMIL SCRIPT (தமிழ்).
 - MUST reply in natural, welcoming Tamil script (e.g. "ஆம் 😊 நாங்கள் உங்கள் social media-வை manage செய்து தருகிறோம். Content, post design, scheduling எல்லாவற்றையும் நாங்களே பார்த்துக் கொள்வோம். Packages பார்க்கலாமா?").
 - STRICT PROHIBITION: NEVER reply in English when the user communicates in Tamil script.
 - STRICT PROHIBITION: NEVER use Sinhala words or script.`,
 
-        en: `TARGET LANGUAGE/STYLE: ENGLISH.
+      en: `TARGET LANGUAGE/STYLE: ENGLISH.
 - Reply in warm, natural, friendly conversational English. Keep it simple, human, and direct.`,
-      };
+    };
 
-      systemPrompt = `You are Hive, a friendly, warm, and helpful sales & support specialist chatting with a visitor on BrandHive Studio's website (${profile.websiteUrl}).
+    const systemPrompt = `You are Hive, a friendly, warm, and helpful sales & support specialist chatting with a visitor on BrandHive Studio's website (${profile.websiteUrl}).
 
 ==================================================
 MANDATORY LANGUAGE/STYLE DIRECTIVE FOR THIS TURN:
@@ -1831,6 +2149,12 @@ CONVERSATIONAL CONTEXT & PRONOUNS:
 - If the customer uses words like "they", "it", "that", "those", "the first one", "how much?", "what are they?", "packages monawada?", "eka keeyada?", "පැකේජ් මොනවද?", "ඒක කීයද?", "adhu evlo?", resolve them using the previous conversation context. Never restart or treat follow-ups as disconnected.
 - If a short follow-up genuinely cannot be resolved from context, ask a short, natural clarification instead of guessing or answering an unrelated topic.
 
+PLATFORM ISOLATION & ACCURACY (CRITICAL):
+- If the customer asks about TikTok, TikTok videos, or TikTok packages, ONLY present and quote TikTok video packages (Starter LKR 5,500, Growth LKR 18,000/month, Premium LKR 32,000/month, extra video add-on LKR 5,000). NEVER quote Facebook, Instagram, or SMM post packages for TikTok inquiries.
+- If the customer asks about Social Media / SMM / Facebook / Instagram, quote the Social Media packages (Starter LKR 14,000/month, Growth LKR 25,000/month, Premium LKR 40,000/month).
+- If the customer asks about Websites, quote Website packages (Starter LKR 35,000, Growth LKR 55,000, Premium LKR 90,000).
+- If the customer asks about Branding, quote Branding packages (Logo Design LKR 8,000, Brand Identity LKR 15,000, Corporate Identity LKR 28,000).
+
 REQUIREMENTS & GOALS:
 - If a customer says what they need (e.g., "I need you to run my business social media", "oyaala social media manage karanawada?", "ඔයාලා සෝෂල් මීඩියා මැනේජ් කරනවද?"), acknowledge it directly and warmly, and naturally ask if they'd like to see the available packages.
 
@@ -1851,6 +2175,12 @@ Return valid JSON with keys:
 - "suggestedAction": (string, optional) Brief helpful action label.
 
 CONVERSATION EXAMPLES (FOLLOW THESE PATTERNS):
+
+[TikTok Example]
+Customer: "tiktok packages monawada?"
+Hive: "TikTok video packages 3k thiyenawa 😊 Starter (LKR 5,500 - single shoot video), Growth (LKR 18,000/mo - 4 videos), saha Premium (LKR 32,000/mo - 8 videos). Oyage business ekata galapenne mona ekada?"
+Customer: "how much for tiktok?"
+Hive: "Our TikTok packages start from LKR 5,500 for a single video, or LKR 18,000/month for 4 videos with on-location shoot and editing 😊 Would you like to see what's included?"
 
 [Singlish Example]
 Customer: "oyaala social media manage karanawada?"
@@ -1890,9 +2220,9 @@ Hive: "Sure, we can manage that for you 😊 We handle the content creation, gra
 Customer: "what are they"
 Hive: "Sure 😊 We have a few packages:\n\n• Starter (from LKR 14,000/mo) — 15 custom posts to keep your pages active.\n• Growth (from LKR 25,000/mo) — 20 custom posts plus 4 reels to grow your reach.\n• Premium (from LKR 40,000/mo) — 30 custom posts, 8 reels, and dedicated campaign support.\n\nWant me to share more details on any of these?"
 
-Authoritative Live Supabase Services & Packages:
+Authoritative Live Turso HIVE Brain Services & Packages:
 ${servicesContext}`;
-    }
+
 
     const configuredModel = process.env.GEMINI_MODEL?.trim().replace(/^["']|["']$/g, "");
     const primaryModel = (configuredModel || "gemini-3.8-flash").replace(/^models\//, "");
@@ -1943,56 +2273,37 @@ ${servicesContext}`;
       }
     }
 
-    const callGeminiApi = async (targetModel: string): Promise<{ ok: boolean; status: number; text: string; error?: string }> => {
-      const cleanModel = targetModel.trim().replace(/^["']|["']$/g, "").replace(/^models\//, "");
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(cleanModel)}:generateContent`;
-      const thinkingConfig = cleanModel.includes("gemini-3")
-        ? { thinkingLevel: "LOW" }
-        : { thinkingBudget: 0 };
+    // callGeminiApi delegates to the exported callGeminiEndpoint so focused tests can
+    // exercise the REAL production parsing and retry logic via fetch injection.
+    const callGeminiApi = (targetModel: string): Promise<GeminiCallResult> =>
+      callGeminiEndpoint(targetModel, apiKey, systemPrompt, geminiContents);
 
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: systemPrompt }],
-            },
-            contents: geminiContents,
-            generationConfig: {
-              temperature: 0.7,
-              responseMimeType: "application/json",
-              thinkingConfig,
-            },
-          }),
-        });
 
-        if (!res.ok) {
-          return { ok: false, status: res.status, text: "" };
-        }
-
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-        return { ok: true, status: res.status, text };
-      } catch (err) {
-        return { ok: false, status: 0, text: "", error: err instanceof Error ? err.message : "Network error" };
-      }
-    };
-
-    // Primary attempt using exact configured model
+    // --- Primary attempt ---
     let response = await callGeminiApi(primaryModel);
 
-    // If primary failed with transient server/network errors (500, 502, 503, 504, or network drops), immediately attempt ONE secondary stable model
-    const isTransient = [500, 502, 503, 504].includes(response.status) || (response.status === 0 && Boolean(response.error));
-    if (!response.ok && isTransient) {
-      console.warn(`[HIVE AI] Primary model (${primaryModel}) transient failure (${response.status || response.error}). Immediately attempting secondary model (${secondaryModel}).`);
+    // Trigger secondary model for:
+    //  (a) HTTP-level transient errors (5xx)
+    //  (b) Network/fetch exceptions (httpStatus === 0)
+    //  (c) HTTP 200 but empty candidates / safety block / any other empty-text result
+    // Previously only case (a)+(b) triggered the secondary; (c) was silently dropped.
+    const shouldTrySecondary = !response.ok || response.text.trim().length === 0;
+
+    if (shouldTrySecondary) {
+      const reason =
+        response.httpStatus === 0
+          ? (response.fetchError ?? "fetch exception")
+          : response.httpStatus >= 400
+          ? `HTTP ${response.httpStatus}`
+          : `empty output (finishReason: ${response.finishReason || "absent"})`;
+      console.warn(
+        `[HIVE AI] Primary model (${primaryModel}) unusable -- ${reason}. Trying secondary (${secondaryModel}).`
+      );
       response = await callGeminiApi(secondaryModel);
     }
 
-    if (response.ok && response.text) {
+    // --- Parse and return Gemini response ---
+    if (response.ok && response.text.trim().length > 0) {
       let rawText = response.text.trim();
       if (rawText.startsWith("```")) {
         rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
@@ -2014,12 +2325,16 @@ ${servicesContext}`;
           suggestedAction: parsed.suggestedAction?.trim() || undefined,
         };
       }
+
+      // Text present but no valid reply key after parse -- fall through to deterministic engine
+      console.warn(`[HIVE AI] Response text present but no valid "reply" key after JSON parse. Falling back.`);
     }
 
-    // Only if both attempts fail to produce a usable response, use the deterministic fallback
-    return getFallbackReply(message, channel, formattedHistory);
+    // --- Both models failed or returned unusable output: deterministic fallback ---
+    return getFallbackReply(message, "web", formattedHistory);
   } catch (error) {
     console.error("[HIVE AI] Unexpected failure in model pipeline, using fallback:", error);
-    return getFallbackReply(message, channel, formattedHistory);
+    return getFallbackReply(message, "web", formattedHistory);
   }
 }
+

@@ -10,7 +10,9 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "tsx src/lib/db/migrate.ts",
+    "db:migrate-brain": "tsx scripts/migrate-supabase-to-turso-brain.ts",
     "db:seed": "tsx src/lib/db/seed.ts",
+
     "db:seed-projects": "tsx src/lib/db/seed-projects.ts",
     "db:seed-services": "tsx src/lib/db/seed-services.ts",
     "db:seed-testimonials": "tsx src/lib/db/seed-testimonials.ts",

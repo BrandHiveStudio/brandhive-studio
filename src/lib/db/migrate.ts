@@ -167,7 +167,78 @@ const tableMigrations = [
     created_at INTEGER NOT NULL DEFAULT (unixepoch()),
     updated_at INTEGER NOT NULL DEFAULT (unixepoch())
   );`,
+
+  `CREATE TABLE IF NOT EXISTS brain_services (
+    id TEXT PRIMARY KEY,
+    slug TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT NOT NULL DEFAULT 'general',
+    item_type TEXT NOT NULL DEFAULT 'service',
+    pricing_type TEXT NOT NULL DEFAULT 'fixed',
+    price REAL,
+    starting_price REAL,
+    currency TEXT NOT NULL DEFAULT 'LKR',
+    unit TEXT,
+    ad_budget_separate INTEGER NOT NULL DEFAULT 0,
+    sku TEXT,
+    inclusions TEXT,
+    exclusions TEXT,
+    metadata TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );`,
+
+  `CREATE TABLE IF NOT EXISTS brain_addons (
+    id TEXT PRIMARY KEY,
+    service_id TEXT REFERENCES brain_services(id) ON DELETE SET NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    pricing_type TEXT NOT NULL DEFAULT 'fixed',
+    price REAL,
+    starting_price REAL,
+    currency TEXT NOT NULL DEFAULT 'LKR',
+    unit TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );`,
+
+  `CREATE TABLE IF NOT EXISTS brain_faqs (
+    id TEXT PRIMARY KEY,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'general',
+    is_active INTEGER NOT NULL DEFAULT 1,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );`,
+
+  `CREATE TABLE IF NOT EXISTS brain_settings (
+    id TEXT PRIMARY KEY,
+    key TEXT NOT NULL UNIQUE,
+    value TEXT NOT NULL,
+    description TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );`,
+
+  `CREATE INDEX IF NOT EXISTS idx_brain_services_category ON brain_services(category);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_services_item_type ON brain_services(item_type);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_services_is_active ON brain_services(is_active);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_services_display_order ON brain_services(display_order);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_addons_service_id ON brain_addons(service_id);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_addons_is_active ON brain_addons(is_active);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_faqs_category ON brain_faqs(category);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_faqs_is_active ON brain_faqs(is_active);`,
+  `CREATE INDEX IF NOT EXISTS idx_brain_settings_key ON brain_settings(key);`,
 ];
+
 
 const columnMigrations = [
   { table: "projects", column: "is_ongoing", ddl: `ALTER TABLE projects ADD COLUMN is_ongoing INTEGER DEFAULT 0;` },

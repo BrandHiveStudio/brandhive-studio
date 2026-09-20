@@ -6,9 +6,10 @@ export const dynamic = "force-dynamic";
 /**
  * GET /api/v1/knowledge/faqs
  * Public read-only endpoint returning active, published FAQs
- * for website consumers, search, and the WhatsApp AI Agent knowledge bridge.
+ * for website consumers and search.
  */
 export async function GET() {
+
   try {
     const faqs = await getPublishedFaqs();
     return NextResponse.json({
