@@ -186,6 +186,62 @@ export async function getBrainServicePricing(searchTerm: string): Promise<Pricin
     }
   }
 
+  // 1b. Direct platform fast-path: Website Packages
+  const isWebsite =
+    normalized.includes("website") ||
+    normalized.includes("web") ||
+    normalized.includes("site") ||
+    normalized.includes("ecommerce") ||
+    normalized.includes("e-commerce") ||
+    normalized.includes("landing page") ||
+    normalized.includes("වෙබ්") ||
+    normalized.includes("வலைத்தளம்");
+
+  if (isWebsite) {
+    const webPackages = all.filter(
+      (s) => s.category === "website" || s.slug.startsWith("web-pkg-")
+    );
+    if (webPackages.length > 0) {
+      if (normalized.includes("starter") || normalized.includes("basic") || normalized.includes("small") || normalized.includes("5 page")) {
+        const starter = webPackages.find((s) => s.slug === "web-pkg-01") || webPackages[0];
+        return {
+          status: "match",
+          service: starter,
+          displayPrice: formatBrainPriceDisplay(starter),
+          inclusions: starter.inclusions ? JSON.parse(starter.inclusions) : [],
+        };
+      }
+      if (normalized.includes("business") || normalized.includes("growing") || normalized.includes("10 page")) {
+        const business = webPackages.find((s) => s.slug === "web-pkg-02") || webPackages[1];
+        return {
+          status: "match",
+          service: business,
+          displayPrice: formatBrainPriceDisplay(business),
+          inclusions: business.inclusions ? JSON.parse(business.inclusions) : [],
+        };
+      }
+      if (normalized.includes("corporate") || normalized.includes("enterprise") || normalized.includes("large")) {
+        const corporate = webPackages.find((s) => s.slug === "web-pkg-03") || webPackages[2];
+        return {
+          status: "match",
+          service: corporate,
+          displayPrice: formatBrainPriceDisplay(corporate),
+          inclusions: corporate.inclusions ? JSON.parse(corporate.inclusions) : [],
+        };
+      }
+      if (normalized.includes("custom")) {
+        const custom = webPackages.find((s) => s.slug === "web-pkg-04") || webPackages[3];
+        return {
+          status: "match",
+          service: custom,
+          displayPrice: formatBrainPriceDisplay(custom),
+          inclusions: custom.inclusions ? JSON.parse(custom.inclusions) : [],
+        };
+      }
+      return { status: "ambiguous", candidates: webPackages.filter((s) => s.itemType === "package") };
+    }
+  }
+
   // 2. Exact slug match
   const slugMatch = all.find((s) => s.slug.toLowerCase() === normalized);
   if (slugMatch) {

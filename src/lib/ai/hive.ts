@@ -157,6 +157,24 @@ function getRecentTopicContext(
     return "tiktok";
   }
   if (
+    recent.includes("website") ||
+    recent.includes("web design") ||
+    recent.includes("web development") ||
+    recent.includes("e-commerce") ||
+    recent.includes("ecommerce") ||
+    recent.includes("online store") ||
+    recent.includes("landing page") ||
+    recent.includes("site") ||
+    recent.includes("වෙබ්") ||
+    recent.includes("වෙබ්සයිට්") ||
+    recent.includes("සයිට්") ||
+    recent.includes("வலைத்தளம்") ||
+    recent.includes("வெப்சைட்") ||
+    recent.includes("சைட்")
+  ) {
+    return "website";
+  }
+  if (
     recent.includes("social media") ||
     recent.includes("facebook") ||
     recent.includes("instagram") ||
@@ -175,24 +193,6 @@ function getRecentTopicContext(
     recent.includes("சமூக")
   ) {
     return "social-media";
-  }
-  if (
-    recent.includes("website") ||
-    recent.includes("web design") ||
-    recent.includes("web development") ||
-    recent.includes("e-commerce") ||
-    recent.includes("ecommerce") ||
-    recent.includes("online store") ||
-    recent.includes("landing page") ||
-    recent.includes("site") ||
-    recent.includes("වෙබ්") ||
-    recent.includes("වෙබ්සයිට්") ||
-    recent.includes("සයිට්") ||
-    recent.includes("வலைத்தளம்") ||
-    recent.includes("வெப்சைட்") ||
-    recent.includes("சைட்")
-  ) {
-    return "website";
   }
   if (
     recent.includes("branding") ||
@@ -876,6 +876,85 @@ async function getWebsiteFallbackReply(
     }
 
     if (effectiveTopic === "website") {
+      // Inquiries about deliverables / inclusions / "what is included" / "that package" / "what do i get" / "starter"
+      if (
+        normalized.includes("what is included") ||
+        normalized.includes("what do i get") ||
+        normalized.includes("included") ||
+        normalized.includes("inclusions") ||
+        normalized.includes("that package") ||
+        normalized.includes("this package") ||
+        normalized.includes("first") ||
+        normalized.includes("starter") ||
+        normalized.includes("මොනවද ලැබෙන්නේ") ||
+        normalized.includes("ඇතුළත්") ||
+        normalized.includes("hambenne") ||
+        normalized.includes("என்ன கிடைக்கும்")
+      ) {
+        if (langStyle === "singlish") {
+          return {
+            reply: "Starter Website package eke (LKR 35,000) pages 5k, fully responsive mobile design, contact inquiry form, WhatsApp chat integration, basic SEO saha Google Maps labenawa 😊 Thawa details balamuda?",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter Website",
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: "Starter Website package-la (LKR 35,000) 5 pages, mobile responsive design, contact form, WhatsApp chat integration, basic SEO and Google Maps kedaikkum 😊 Innum details paakkalaama?",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter Website",
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: "Starter Website package එකට (LKR 35,000) pages 5ක්, mobile responsive design, contact form, WhatsApp chat integration, basic SEO සහ Google Maps ඇතුළත් වෙනවා 😊 වැඩිදුර විස්තර දැනගන්න කැමතිද?",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter Website",
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: "Starter Website package-ல் (LKR 35,000) 5 pages, mobile responsive design, contact form, WhatsApp chat integration, basic SEO மற்றும் Google Maps கிடைக்கும் 😊 மேலும் விவரங்கள் பார்க்கலாமா?",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Starter Website",
+          };
+        }
+        return {
+          reply: "Our Starter Website package (from LKR 35,000) includes up to 5 pages, fully responsive mobile design, contact inquiry form, WhatsApp chat integration, basic SEO setup, and Google Maps integration 😊 Would you like to get started with this package?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about Starter Website",
+        };
+      }
+
+      // Inquiries about business website package
+      if (
+        normalized.includes("business") ||
+        normalized.includes("second") ||
+        normalized.includes("10 page") ||
+        normalized.includes("දෙවෙනි") ||
+        normalized.includes("இரண்டாவது")
+      ) {
+        if (langStyle === "singlish") {
+          return {
+            reply: "Business Website package eka LKR 75,000 indala thiyenawa. Pages 10k, premium UI, dynamic CMS, blog, advanced SEO saha analytics labenawa 😊",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Business Website",
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: "Business Website package එක LKR 75,000 සිට පවතී. Pages 10ක්, premium UI, dynamic CMS, blog, advanced SEO සහ analytics ඇතුළත් වේ 😊",
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Business Website",
+          };
+        }
+        return {
+          reply: "Our Business Website package (from LKR 75,000) includes up to 10 pages, premium UI design, dynamic CMS integration, blog setup, advanced SEO, and analytics 😊",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about Business Website",
+        };
+      }
+
       if (langStyle === "singlish") {
         return {
           reply: "Sure 😊 Website packages 3k thiyenawa:\n\n• Starter Website (LKR 35,000 indala) — Pages 5k, mobile-friendly.\n• Business Website (LKR 75,000 indala) — Pages 10k, full management ekka.\n• Corporate (LKR 150,000 indala) — Custom built platform ekak.\n\nOyalata aluth website ekakda one?",
@@ -1571,6 +1650,52 @@ async function getWebsiteFallbackReply(
         reply: "Sure 😊 Our social media packages start from LKR 14,000/month (Starter package) up to LKR 40,000/month (Premium package). If you tell me what you need help with, I can show you the right package.",
         needsLeadCapture: false,
         suggestedAction: "Ask about package details",
+      };
+    }
+
+    // Direct match for website packages pricing
+    if (
+      serviceSearchTerm.includes("website") ||
+      serviceSearchTerm.includes("web") ||
+      serviceSearchTerm.includes("site") ||
+      serviceSearchTerm.includes("ecommerce") ||
+      serviceSearchTerm.includes("e-commerce") ||
+      serviceSearchTerm.includes("landing page") ||
+      serviceSearchTerm.includes("වෙබ්") ||
+      serviceSearchTerm.includes("வலைத்தளம்")
+    ) {
+      if (langStyle === "singlish") {
+        return {
+          reply: "Sure 😊 Ape website packages LKR 35,000 (Starter Website - pages 5k) indala LKR 150,000 (Corporate Website) wenakam thiyenawa. Business Website eka LKR 75,000 wenawa. Custom platforms walatath api solutions denawa. Oyalata one details tika mama kiyannada?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about website package details",
+        };
+      }
+      if (langStyle === "tanglish") {
+        return {
+          reply: "Sure 😊 Namma website packages LKR 35,000 (Starter Website - 5 pages) la irundhu LKR 150,000 (Corporate Website) varaikkum irukku. Business Website LKR 75,000 varum. Ungalukku enna theva nu sonnaa correct package solren.",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about website package details",
+        };
+      }
+      if (langStyle === "sinhala") {
+        return {
+          reply: "අපේ website packages LKR 35,000 (Starter Website - pages 5ක්) සිට LKR 150,000 (Corporate Website) දක්වා තියෙනවා 😊 Business Website එක LKR 75,000 වෙනවා. විස්තර දැනගන්න කැමතිද?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about website package details",
+        };
+      }
+      if (langStyle === "tamil") {
+        return {
+          reply: "எங்க website packages LKR 35,000 (Starter Website - 5 pages) முதல் LKR 150,000 (Corporate Website) வரை இருக்கு 😊 Business Website LKR 75,000 வரும். விவரங்கள் சொல்லவா?",
+          needsLeadCapture: false,
+          suggestedAction: "Ask about website package details",
+        };
+      }
+      return {
+        reply: "Sure 😊 Our website packages start from LKR 35,000 for Starter (up to 5 pages), LKR 75,000 for Business (up to 10 pages with CMS & blog), and LKR 150,000 for Corporate (tailored multi-page build). We also build custom web solutions. Would you like details on what's included?",
+        needsLeadCapture: false,
+        suggestedAction: "Ask about website package details",
       };
     }
 
