@@ -343,9 +343,17 @@ function getProjectAssets(folderName: string) {
 }
 
 export async function generateStaticParams() {
-  return projectsData.map((project) => ({
-    slug: project.slug,
-  }));
+  // Include both hardcoded static slugs AND all published DB project slugs
+  const staticSlugs = projectsData.map((p) => p.slug);
+  let dbSlugs: string[] = [];
+  try {
+    const { getPublishedProjects } = await import("@/lib/db/queries/projects");
+    const dbProjects = await getPublishedProjects();
+    dbSlugs = dbProjects.map((p) => p.slug).filter((s) => !staticSlugs.includes(s));
+  } catch {
+    // Non-fatal: static params still generated from hardcoded list
+  }
+  return [...staticSlugs, ...dbSlugs].map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -423,12 +431,31 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const localSections = getProjectAssets(folderName);
   const sections = dbData && dbData.sections.length > 0 ? dbData.sections : localSections;
 
-  const currentIndex = projectsData.findIndex((p) => p.slug === slug);
-  const prevIndex = (currentIndex - 1 + projectsData.length) % projectsData.length;
-  const nextIndex = (currentIndex + 1) % projectsData.length;
+  // Build a merged navigation list: static projects + any extra DB-only ones
+  // DB projects that match a static slug are already represented; add unique DB-only
+  const dbNavProjects = dbData?.project
+    ? [dbData.project].filter((dp) => !projectsData.some((sp) => sp.slug === dp.slug)).map((dp) => ({
+        slug: dp.slug,
+        title: dp.title,
+        category: dp.category,
+        shortDescription: dp.shortDescription,
+        description: dp.description,
+        cover: dp.cover,
+        logo: dp.logo,
+        client: dp.client,
+        role: dp.role,
+        year: dp.year,
+        deliverables: dp.badges,
+        isOngoing: dp.isOngoing,
+      }))
+    : [];
+  const allNavProjects = [...projectsData, ...dbNavProjects];
+  const currentIndex = allNavProjects.findIndex((p) => p.slug === slug);
+  const prevIndex = currentIndex <= 0 ? allNavProjects.length - 1 : currentIndex - 1;
+  const nextIndex = currentIndex >= allNavProjects.length - 1 ? 0 : currentIndex + 1;
 
-  const prevProject: Project = projectsData[prevIndex] || project;
-  const nextProject: Project = projectsData[nextIndex] || project;
+  const prevProject: Project = (allNavProjects[prevIndex] as Project) || project;
+  const nextProject: Project = (allNavProjects[nextIndex] as Project) || project;
 
   return (
     <ProjectClient

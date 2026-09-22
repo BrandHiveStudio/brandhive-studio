@@ -21,14 +21,14 @@ export interface CompanyProfile {
 
 export const fallbackCompanyProfile: CompanyProfile = {
   name: "BrandHive Studio",
-  tagline: "Premium branding, UI/UX, and digital experiences",
+  tagline: "Crafting Brands That Inspire",
   contactNumber: "+94 70 641 0093",
   whatsappUrl: "https://wa.me/94706410093",
   email: "brandhive.studio.lk@gmail.com",
   websiteUrl: "https://brandhivestudio.com.lk",
-  businessHours: "Monday to Friday: 9:00 AM – 6:00 PM (Asia/Colombo)",
+  businessHours: "Monday to Saturday: 9:00 AM – 6:00 PM, Sunday: Closed (Asia/Colombo, UTC+5:30)",
   paymentTerms: "50% advance to initiate project, 50% upon final delivery.",
-  paymentMethods: "Bank Transfer, Credit/Debit Cards, Online Transfer",
+  paymentMethods: "Cash, Bank Transfer",
   process: ["Discovery", "Strategy", "Design", "Development", "Launch"],
 };
 
