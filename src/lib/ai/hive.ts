@@ -229,7 +229,7 @@ function cleanPricingQuery(message: string): string {
   return message
     .toLowerCase()
     .replace(
-      /\b(how much do you charge for|how much do you charge|how much does it cost for|how much does it cost|how much is|how much for|how much|what do you charge for|what do you charge|what is the price of|what is the cost of|pricing for|price of|price|cost|quote|budget|estimate|starting from|fee|rates?|for|a|an|the|please|brandhive|monawada|keeyada|ganan|kohomada|evlo|vilai|enna|packages|package)\b/g,
+      /\b(how much do you charge for|how much do you charge|how much does it cost for|how much does it cost|how much is|how much for|how much|what do you charge for|what do you charge|what is the price of|what is the cost of|pricing for|price of|price|cost|quote|budget|estimate|starting from|fee|rates?|what is included in|what is included|what's included|whats included|what do i get|included in|included|includes|include|in that|in this|that|this|for|a|an|the|please|brandhive|monawada|keeyada|ganan|kohomada|evlo|vilai|enna|packages|package)\b/g,
       " "
     )
     .replace(/[?.,!]/g, "")
@@ -465,6 +465,15 @@ function isReferentialMessage(normalized: string): boolean {
     /(packages enna|enna packages irukku|adhu evlo|evlo|first one pathi sollunga|reels irukka|enna include aagum|edhu suit aagum)/i.test(
       normalized
     ) ||
+    normalized.includes("what is included") ||
+    normalized.includes("what's included") ||
+    normalized.includes("whats included") ||
+    normalized.includes("in that package") ||
+    normalized.includes("in this package") ||
+    normalized.includes("that package") ||
+    normalized.includes("this package") ||
+    normalized.includes("what do i get") ||
+    normalized.includes("included in that") ||
     normalized.includes("පැකේජ් මොනවද") ||
     normalized.includes("packages මොනවද") ||
     normalized.includes("මොනවද තියෙන්නේ") ||
