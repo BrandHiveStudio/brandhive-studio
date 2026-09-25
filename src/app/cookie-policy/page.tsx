@@ -25,7 +25,7 @@ export default function CookiePolicyPage() {
     >
       {/* 1. What Are Cookies? */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           1. What Are Cookies?
         </h2>
         <p>
@@ -38,7 +38,7 @@ export default function CookiePolicyPage() {
 
       {/* 2. Types of Technologies */}
       <section className="space-y-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           2. Types of Technologies &amp; Cookie Categories
         </h2>
         <p>
@@ -47,73 +47,73 @@ export default function CookiePolicyPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Essential */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div className="p-5 rounded-2xl bg-[#11161C]/60 border border-white/10 backdrop-blur-md shadow-lg flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <h3 className="text-base font-bold text-[#0F172A]">Essential Cookies</h3>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
+                <h3 className="text-base font-bold text-white">Essential Cookies</h3>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[10px] font-bold uppercase tracking-wider">
                   Always Active
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
                 Essential for core website operation, security, network routing, and load balancing. The website cannot function correctly without these technologies, and they do not store personally identifiable marketing information.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+            <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-white/45">
               Retention: Session / Persistent
             </div>
           </div>
 
           {/* Analytics */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div className="p-5 rounded-2xl bg-[#11161C]/60 border border-white/10 backdrop-blur-md shadow-lg flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <h3 className="text-base font-bold text-[#0F172A]">Analytics Cookies</h3>
-                <span className="px-2 py-0.5 rounded-full bg-cyan-50 text-[#0284C7] border border-cyan-200 text-[10px] font-bold uppercase tracking-wider">
+                <h3 className="text-base font-bold text-white">Analytics Cookies</h3>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#16C7FF]/10 text-[#16C7FF] border border-[#16C7FF]/25 text-[10px] font-bold uppercase tracking-wider">
                   Consent Gated (ON / OFF)
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
                 Help us understand how visitors interact with our pages, identify popular portfolio case studies, and measure page load speeds. They are loaded strictly after you give explicit consent.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+            <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-white/45">
               Provider: Google Analytics (G-S2Z1B36031)
             </div>
           </div>
 
           {/* Preferences */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div className="p-5 rounded-2xl bg-[#11161C]/60 border border-white/10 backdrop-blur-md shadow-lg flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <h3 className="text-base font-bold text-[#0F172A]">Preferences</h3>
-                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                <h3 className="text-base font-bold text-white">Preferences</h3>
+                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.05] text-white/70 border border-white/10 text-[10px] font-bold uppercase tracking-wider">
                   Optional (ON / OFF)
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
                 Remember your specific interaction choices (such as UI sound toggles, animations, or cookie banner choices) so your preferred experience is maintained on return visits.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+            <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-white/45">
               Retention: Local Browser Storage
             </div>
           </div>
 
           {/* Marketing */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div className="p-5 rounded-2xl bg-[#11161C]/60 border border-white/10 backdrop-blur-md shadow-lg flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <h3 className="text-base font-bold text-[#0F172A]">Marketing Cookies</h3>
-                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                <h3 className="text-base font-bold text-white">Marketing Cookies</h3>
+                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.05] text-white/70 border border-white/10 text-[10px] font-bold uppercase tracking-wider">
                   Optional (ON / OFF)
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
                 Used to track visitors across websites to display relevant promotional material. Marketing cookies are not claimed as active unless specifically implemented and enabled.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+            <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-white/45">
               Status: Inactive by Default
             </div>
           </div>
@@ -121,27 +121,27 @@ export default function CookiePolicyPage() {
       </section>
 
       {/* 3. Google Analytics */}
-      <section className="space-y-4 rounded-2xl bg-slate-50 p-6 border border-slate-200">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#12BDF7]" />
-          <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">
+      <section className="space-y-4 rounded-2xl bg-[#11161C]/60 p-6 sm:p-7 border border-white/10 backdrop-blur-md shadow-xl">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2 h-2 rounded-full bg-[#16C7FF] shadow-[0_0_10px_#16C7FF]" />
+          <h2 className="text-xl font-bold text-white tracking-tight">
             3. Google Analytics Integration
           </h2>
         </div>
         <p>
-          The production BrandHive Studio website utilizes Google Analytics with Measurement ID: <strong className="font-mono text-xs bg-slate-200/80 px-2 py-0.5 rounded text-[#0F172A]">G-S2Z1B36031</strong>.
+          The production BrandHive Studio website utilizes Google Analytics with Measurement ID: <strong className="font-mono text-xs bg-white/10 px-2 py-0.5 rounded text-white border border-white/10">G-S2Z1B36031</strong>.
         </p>
         <p>
           In accordance with international privacy principles, <strong>Google Analytics MUST NOT load and does not execute before you provide explicit Analytics consent</strong>. When analytics consent is refused or not yet provided, no analytics tracking scripts or measurement requests are transmitted to Google servers.
         </p>
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
           Google Analytics collects aggregate, anonymized metrics including page views, visit duration, device characteristics, and referral channels to help us improve the layout and technical performance of our website.
         </p>
       </section>
 
       {/* 4. Third-Party Cookies */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           4. Third-Party Cookies
         </h2>
         <p>
@@ -150,8 +150,8 @@ export default function CookiePolicyPage() {
       </section>
 
       {/* 5. Managing Your Preferences */}
-      <section className="space-y-5 rounded-2xl bg-white p-6 sm:p-8 border border-slate-200 shadow-sm">
-        <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">
+      <section className="space-y-5 rounded-2xl bg-[#11161C]/60 p-6 sm:p-8 border border-white/10 backdrop-blur-md shadow-xl">
+        <h2 className="text-xl font-bold text-white tracking-tight">
           5. Managing Your Cookie Preferences
         </h2>
         <p>
@@ -162,14 +162,14 @@ export default function CookiePolicyPage() {
           <OpenCookieSettingsButton />
         </div>
 
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pt-2">
+        <p className="text-xs sm:text-sm text-white/65 leading-relaxed pt-2">
           Additionally, you can configure your web browser (Chrome, Safari, Firefox, Edge) to block or delete cookies across all websites. Please refer to your browser&apos;s official help documentation for browser-level cookie management.
         </p>
       </section>
 
       {/* 6. Changes to This Cookie Policy */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           6. Changes to This Cookie Policy
         </h2>
         <p>
@@ -179,18 +179,18 @@ export default function CookiePolicyPage() {
 
       {/* 7. Contact */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           7. Contact
         </h2>
         <p>
           If you have questions regarding our use of cookies or tracking technologies, please contact:
         </p>
-        <div className="rounded-xl bg-slate-100/80 p-5 space-y-2 border border-slate-200 text-sm">
-          <p><strong className="text-[#0F172A]">Agency:</strong> BrandHive Studio</p>
-          <p><strong className="text-[#0F172A]">Location:</strong> Interceed Waththa, Kattuwa, Negombo, Sri Lanka</p>
-          <p><strong className="text-[#0F172A]">Official Business Email:</strong> <a href="mailto:info@brandhivestudio.com.lk" className="text-[#0284C7] underline font-semibold">info@brandhivestudio.com.lk</a></p>
-          <p><strong className="text-[#0F172A]">WhatsApp / Phone:</strong> <a href="tel:+94706410093" className="text-[#0284C7] underline font-semibold">+94 70 641 0093</a></p>
-          <p><strong className="text-[#0F172A]">Website:</strong> <a href="https://www.brandhivestudio.com.lk" className="text-[#0284C7] underline font-semibold">www.brandhivestudio.com.lk</a></p>
+        <div className="rounded-2xl bg-[#11161C]/60 p-5 sm:p-6 space-y-2 border border-white/10 backdrop-blur-md text-sm text-white/80">
+          <p><strong className="text-white">Agency:</strong> BrandHive Studio</p>
+          <p><strong className="text-white">Location:</strong> Interceed Waththa, Kattuwa, Negombo, Sri Lanka</p>
+          <p><strong className="text-white">Official Business Email:</strong> <a href="mailto:info@brandhivestudio.com.lk" className="text-[#16C7FF] hover:text-[#60D6FF] underline font-semibold">info@brandhivestudio.com.lk</a></p>
+          <p><strong className="text-white">WhatsApp / Phone:</strong> <a href="tel:+94706410093" className="text-[#16C7FF] hover:text-[#60D6FF] underline font-semibold">+94 70 641 0093</a></p>
+          <p><strong className="text-white">Website:</strong> <a href="https://www.brandhivestudio.com.lk" className="text-[#16C7FF] hover:text-[#60D6FF] underline font-semibold">www.brandhivestudio.com.lk</a></p>
         </div>
       </section>
     </PolicyLayout>

@@ -24,12 +24,12 @@ export default function TermsPage() {
     >
       {/* 1. Introduction */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           1. Introduction
         </h2>
         <p>
           Welcome to BrandHive Studio (&ldquo;BrandHive Studio,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), operating via{" "}
-          <strong className="text-[#0F172A]">www.brandhivestudio.com.lk</strong>. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your access to and use of our website, as well as the commercial terms governing our creative, design, software, and marketing engagements.
+          <strong className="text-white">www.brandhivestudio.com.lk</strong>. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your access to and use of our website, as well as the commercial terms governing our creative, design, software, and marketing engagements.
         </p>
         <p>
           By accessing or using our website, submitting an inquiry, or commissioning a project with BrandHive Studio, you agree to be bound by these Terms. If you do not agree with any part of these Terms, please refrain from using our website or commissioning our services.
@@ -38,18 +38,18 @@ export default function TermsPage() {
 
       {/* 2. Services */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           2. Services
         </h2>
         <p>
           BrandHive Studio provides premium creative and digital engineering services, including but not limited to:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 text-slate-700">
-          <li><strong>Brand Identity:</strong> Visual identity design, logo suites, brand strategy, design systems, and guidelines.</li>
-          <li><strong>Website Design &amp; Development:</strong> Custom responsive websites, web applications, corporate platforms, and CMS integration.</li>
-          <li><strong>UI/UX Design:</strong> Interface design, user experience architecture, mobile app interfaces, design audits, and interactive prototyping.</li>
-          <li><strong>Growth Marketing:</strong> Performance strategy, digital content design, campaign assets, and social media brand positioning.</li>
-          <li><strong>Software Development:</strong> Custom digital solutions, workflows, and business application architecture.</li>
+        <ul className="list-disc pl-5 space-y-1.5 text-white/75">
+          <li><strong className="text-white">Brand Identity:</strong> Visual identity design, logo suites, brand strategy, design systems, and guidelines.</li>
+          <li><strong className="text-white">Website Design &amp; Development:</strong> Custom responsive websites, web applications, corporate platforms, and CMS integration.</li>
+          <li><strong className="text-white">UI/UX Design:</strong> Interface design, user experience architecture, mobile app interfaces, design audits, and interactive prototyping.</li>
+          <li><strong className="text-white">Growth Marketing:</strong> Performance strategy, digital content design, campaign assets, and social media brand positioning.</li>
+          <li><strong className="text-white">Software Development:</strong> Custom digital solutions, workflows, and business application architecture.</li>
         </ul>
         <p>
           All deliverables, specifications, and scope boundaries are established on an individual project agreement or quotation basis.
@@ -58,7 +58,7 @@ export default function TermsPage() {
 
       {/* 3. Service Pricing */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           3. Service Pricing
         </h2>
         <p>
@@ -71,7 +71,7 @@ export default function TermsPage() {
 
       {/* 4. Quotations */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           4. Quotations
         </h2>
         <p>
@@ -80,10 +80,10 @@ export default function TermsPage() {
       </section>
 
       {/* 5. Payment Terms */}
-      <section className="space-y-4 rounded-2xl bg-slate-50 p-6 border border-slate-200">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#12BDF7]" />
-          <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">
+      <section className="space-y-5 rounded-2xl bg-[#11161C]/60 p-6 sm:p-7 border border-white/10 backdrop-blur-md shadow-xl">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2 h-2 rounded-full bg-[#16C7FF] shadow-[0_0_10px_#16C7FF]" />
+          <h2 className="text-xl font-bold text-white tracking-tight">
             5. Payment Terms
           </h2>
         </div>
@@ -91,32 +91,32 @@ export default function TermsPage() {
           Standard project engagements operate on the following milestone structure:
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-2">
-          <div className="p-4 rounded-xl bg-white border border-slate-200">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0284C7]">Milestone 1</span>
-            <p className="text-lg font-extrabold text-[#0F172A] mt-1">50% Advance Payment</p>
-            <p className="text-xs text-slate-600 mt-1">Required prior to project commencement, discovery, and design work.</p>
+          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#16C7FF]">Milestone 1</span>
+            <p className="text-lg font-extrabold text-white mt-1">50% Advance Payment</p>
+            <p className="text-xs text-white/60 mt-1 leading-relaxed">Required prior to project commencement, discovery, and design work.</p>
           </div>
-          <div className="p-4 rounded-xl bg-white border border-slate-200">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0284C7]">Milestone 2</span>
-            <p className="text-lg font-extrabold text-[#0F172A] mt-1">50% Before Final Delivery</p>
-            <p className="text-xs text-slate-600 mt-1">Required upon project approval and prior to release of final source files or live website deployment.</p>
+          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#16C7FF]">Milestone 2</span>
+            <p className="text-lg font-extrabold text-white mt-1">50% Before Final Delivery</p>
+            <p className="text-xs text-white/60 mt-1 leading-relaxed">Required upon project approval and prior to release of final source files or live website deployment.</p>
           </div>
         </div>
-        <div className="space-y-2 pt-2">
-          <p><strong>Accepted Payment Methods:</strong></p>
-          <ul className="list-disc pl-5 space-y-1 text-slate-700">
+        <div className="space-y-2 pt-1">
+          <p><strong className="text-white">Accepted Payment Methods:</strong></p>
+          <ul className="list-disc pl-5 space-y-1 text-white/75">
             <li>Bank Transfer</li>
             <li>Cash</li>
           </ul>
         </div>
-        <p className="text-xs text-slate-500 pt-1">
+        <p className="text-xs text-white/50 pt-1">
           Work commences only after confirmation of the initial advance payment. Invoices must be settled within the time specified on the invoice.
         </p>
       </section>
 
       {/* 6. Project Scope */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           6. Project Scope
         </h2>
         <p>
@@ -126,13 +126,13 @@ export default function TermsPage() {
 
       {/* 7. Client Responsibilities */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           7. Client Responsibilities
         </h2>
         <p>
           Successful project delivery requires active collaboration. The client agrees to:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 text-slate-700">
+        <ul className="list-disc pl-5 space-y-1.5 text-white/75">
           <li>Provide necessary brand assets, copywriting, photography, product specifications, and credentials in a timely manner.</li>
           <li>Designate an authorized representative with authority to approve milestones and design directions.</li>
           <li>Provide clear, consolidated feedback during review cycles.</li>
@@ -142,7 +142,7 @@ export default function TermsPage() {
 
       {/* 8. Revisions */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           8. Revisions
         </h2>
         <p>
@@ -152,7 +152,7 @@ export default function TermsPage() {
 
       {/* 9. Project Timelines */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           9. Project Timelines
         </h2>
         <p>
@@ -162,7 +162,7 @@ export default function TermsPage() {
 
       {/* 10. Third-Party Costs */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           10. Third-Party Costs
         </h2>
         <p>
@@ -172,11 +172,11 @@ export default function TermsPage() {
 
       {/* 11. Ownership & Final Deliverables */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           11. Ownership &amp; Final Deliverables
         </h2>
         <p>
-          Upon receipt of <strong>100% full and final payment</strong>, all intellectual property rights to the final approved deliverables created specifically for the client are transferred to the client.
+          Upon receipt of <strong className="text-white">100% full and final payment</strong>, all intellectual property rights to the final approved deliverables created specifically for the client are transferred to the client.
         </p>
         <p>
           BrandHive Studio retains ownership of preliminary concepts, unselected draft options, reusable code libraries, proprietary development tooling, and general design techniques developed during the engagement.
@@ -185,7 +185,7 @@ export default function TermsPage() {
 
       {/* 12. Portfolio Usage */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           12. Portfolio Usage
         </h2>
         <p>
@@ -195,11 +195,11 @@ export default function TermsPage() {
 
       {/* 13. Website Content & Availability */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           13. Website Content &amp; Availability
         </h2>
         <p>
-          All content, visual assets, text, photography, and code on <strong className="text-[#0F172A]">www.brandhivestudio.com.lk</strong> are the intellectual property of BrandHive Studio and protected by applicable copyright and trademark laws. You may not copy, reproduce, distribute, or create derivative works from website materials without our prior written consent.
+          All content, visual assets, text, photography, and code on <strong className="text-white">www.brandhivestudio.com.lk</strong> are the intellectual property of BrandHive Studio and protected by applicable copyright and trademark laws. You may not copy, reproduce, distribute, or create derivative works from website materials without our prior written consent.
         </p>
         <p>
           While we strive for 100% uptime, we do not warrant that our website will be uninterrupted or error-free at all times.
@@ -208,7 +208,7 @@ export default function TermsPage() {
 
       {/* 14. Business Results */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           14. Business Results
         </h2>
         <p>
@@ -218,7 +218,7 @@ export default function TermsPage() {
 
       {/* 15. Promotional Offers */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           15. Promotional Offers
         </h2>
         <p>
@@ -228,7 +228,7 @@ export default function TermsPage() {
 
       {/* 16. Terms Changes */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           16. Terms Changes
         </h2>
         <p>
@@ -238,18 +238,18 @@ export default function TermsPage() {
 
       {/* 17. Contact */}
       <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight border-b border-slate-200 pb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight border-b border-white/10 pb-2.5">
           17. Contact
         </h2>
         <p>
           If you have questions regarding these Terms &amp; Conditions or wish to discuss an engagement, please contact us:
         </p>
-        <div className="rounded-xl bg-slate-100/80 p-5 space-y-2 border border-slate-200 text-sm">
-          <p><strong className="text-[#0F172A]">Agency:</strong> BrandHive Studio</p>
-          <p><strong className="text-[#0F172A]">Location:</strong> Interceed Waththa, Kattuwa, Negombo, Sri Lanka</p>
-          <p><strong className="text-[#0F172A]">Official Business Email:</strong> <a href="mailto:info@brandhivestudio.com.lk" className="text-[#0284C7] underline font-semibold">info@brandhivestudio.com.lk</a></p>
-          <p><strong className="text-[#0F172A]">WhatsApp / Phone:</strong> <a href="tel:+94706410093" className="text-[#0284C7] underline font-semibold">+94 70 641 0093</a></p>
-          <p><strong className="text-[#0F172A]">Website:</strong> <a href="https://www.brandhivestudio.com.lk" className="text-[#0284C7] underline font-semibold">www.brandhivestudio.com.lk</a></p>
+        <div className="rounded-2xl bg-[#11161C]/60 p-5 sm:p-6 space-y-2 border border-white/10 backdrop-blur-md text-sm text-white/80">
+          <p><strong className="text-white">Agency:</strong> BrandHive Studio</p>
+          <p><strong className="text-white">Location:</strong> Interceed Waththa, Kattuwa, Negombo, Sri Lanka</p>
+          <p><strong className="text-white">Official Business Email:</strong> <a href="mailto:info@brandhivestudio.com.lk" className="text-[#16C7FF] hover:text-[#60D6FF] underline font-semibold">info@brandhivestudio.com.lk</a></p>
+          <p><strong className="text-white">WhatsApp / Phone:</strong> <a href="tel:+94706410093" className="text-[#16C7FF] hover:text-[#60D6FF] underline font-semibold">+94 70 641 0093</a></p>
+          <p><strong className="text-white">Website:</strong> <a href="https://www.brandhivestudio.com.lk" className="text-[#16C7FF] hover:text-[#60D6FF] underline font-semibold">www.brandhivestudio.com.lk</a></p>
         </div>
       </section>
     </PolicyLayout>
