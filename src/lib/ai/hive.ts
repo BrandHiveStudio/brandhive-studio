@@ -74,11 +74,11 @@ export type LanguageStyle = "en" | "singlish" | "sinhala" | "tanglish" | "tamil"
 const TANGLISH_MARKERS = [
   /\bpanreengala\b/, /\bpannuvom\b/, /\bpannalama\b/, /\bpanna\b/, /\bpanrom\b/,
   /\bpannuveengala\b/, /\bpannuvengala\b/, /\bevlo\b/, /\bevvlavu\b/, /\birukku\b/,
-  /\birukka\b/, /\benna\b/, /\badhu\b/, /\bsolla\b/, /\bsollunga\b/, /\bpathi\b/,
-  /\bkudunga\b/, /\baagum\b/, /\bvilai\b/, /\bunga\b/, /\bungalukku\b/, /\bnalla\b/,
-  /\billai\b/, /\bvenum\b/, /\bseiyalama\b/, /\bseivingala\b/, /\btheriyuma\b/,
+  /\birukka\b/, /\benna\b/, /\badhu\b/, /\bandha\b/, /\bsolla\b/, /\bsollunga\b/, /\bpathi\b/,
+  /\bkudunga\b/, /\baagum\b/, /\baaguma\b/, /\bvilai\b/, /\bunga\b/, /\bungalukku\b/, /\bnalla\b/,
+  /\billai\b/, /\billa\b/, /\bvenum\b/, /\bseiyalama\b/, /\bseivingala\b/, /\btheriyuma\b/,
   /\bpaakkalaama\b/, /\bpesalaama\b/, /\bkandippa\b/, /\bkandippen\b/, /\bmudiyuma\b/,
-  /\btheva\b/, /\bpudhu\b/
+  /\btheva\b/, /\bpudhu\b/, /\benakku\b/, /\bkedaikkum\b/
 ];
 
 // Distinctive Singlish markers (Romanized Sinhala words) - STRICTLY NO TAMIL WORDS
@@ -90,7 +90,8 @@ const SINGLISH_MARKERS = [
   /\bdanna\b/, /\bmata\b/, /\bape\b/, /\boyala\b/, /\boyalage\b/, /\boyata\b/,
   /\bmokakda\b/, /\bhari\b/, /\bkiyanna\b/, /\bneda\b/, /\bmehema\b/, /\bowa\b/,
   /\bthawa\b/, /\bganna\b/, /\bkiyada\b/, /\bona\b/, /\boneda\b/, /\baniwarenma\b/,
-  /\bdennam\b/, /\bbalagannam\b/, /\bkihipayak\b/, /\bmewaye\b/
+  /\bdennam\b/, /\bbalagannam\b/, /\bkihipayak\b/, /\bmewaye\b/, /\bwenne\b/,
+  /\bwenawada\b/, /\beke\b/, /\bhambenne\b/
 ];
 
 /**
@@ -234,6 +235,126 @@ function cleanPricingQuery(message: string): string {
     )
     .replace(/[?.,!]/g, "")
     .trim();
+}
+
+/**
+ * Resolves the currently active or most recently discussed package from conversation history.
+ */
+function getActivePackageFromHistory(
+  history: Array<{ role: "assistant" | "user"; content: string }>,
+  allServices: BrainService[]
+): BrainService | null {
+  if (!history || history.length === 0) return null;
+  const reversed = [...history].reverse();
+  for (const turn of reversed) {
+    const text = (turn.content || "").toLowerCase();
+
+    // Starter Website
+    if (
+      text.includes("starter website") ||
+      (text.includes("starter") && (text.includes("website") || text.includes("web") || text.includes("35,000") || text.includes("35000")))
+    ) {
+      const match = allServices.find((s) => s.slug === "web-pkg-01");
+      if (match) return match;
+    }
+    // Business Website
+    if (
+      text.includes("business website") ||
+      (text.includes("business") && (text.includes("website") || text.includes("web") || text.includes("75,000") || text.includes("75000")))
+    ) {
+      const match = allServices.find((s) => s.slug === "web-pkg-02");
+      if (match) return match;
+    }
+    // Corporate Website
+    if (
+      text.includes("corporate website") ||
+      (text.includes("corporate") && (text.includes("website") || text.includes("web") || text.includes("150,000") || text.includes("150000")))
+    ) {
+      const match = allServices.find((s) => s.slug === "web-pkg-03");
+      if (match) return match;
+    }
+    // Custom Web Solution
+    if (text.includes("custom web") || text.includes("custom website")) {
+      const match = allServices.find((s) => s.slug === "web-pkg-04");
+      if (match) return match;
+    }
+    // TikTok packages
+    if (text.includes("starter tiktok") || (text.includes("starter") && text.includes("tiktok"))) {
+      const match = allServices.find((s) => s.slug === "ttk-pkg-01");
+      if (match) return match;
+    }
+    if (text.includes("growth tiktok") || (text.includes("growth") && text.includes("tiktok"))) {
+      const match = allServices.find((s) => s.slug === "ttk-pkg-02");
+      if (match) return match;
+    }
+    if (text.includes("premium tiktok") || (text.includes("premium") && text.includes("tiktok"))) {
+      const match = allServices.find((s) => s.slug === "ttk-pkg-03");
+      if (match) return match;
+    }
+    // Social Media packages
+    if (text.includes("starter social") || (text.includes("starter") && (text.includes("social media") || text.includes("14,000")))) {
+      const match = allServices.find((s) => s.slug === "smm-pkg-01a");
+      if (match) return match;
+    }
+    if (text.includes("growth social") || (text.includes("growth") && (text.includes("social media") || text.includes("25,000")))) {
+      const match = allServices.find((s) => s.slug === "smm-pkg-02a");
+      if (match) return match;
+    }
+    if (text.includes("premium social") || (text.includes("premium") && (text.includes("social media") || text.includes("40,000")))) {
+      const match = allServices.find((s) => s.slug === "smm-pkg-03a");
+      if (match) return match;
+    }
+
+    // Generic match by package name
+    for (const service of allServices) {
+      if (service.itemType === "package" && text.includes(service.name.toLowerCase())) {
+        return service;
+      }
+    }
+  }
+
+  // Fallback to recent topic context if website was the topic
+  const recentTopic = getRecentTopicContext(history);
+  if (recentTopic === "website") {
+    return allServices.find((s) => s.slug === "web-pkg-01") || null;
+  }
+  return null;
+}
+
+/**
+ * Checks if a message is asking whether a quoted package price is fixed or can change with requirements.
+ */
+function isPriceFlexibilityInquiry(normalized: string): boolean {
+  return (
+    /(price.*(fixed|change|increase|vary|negotiable|final|flexible))|(fixed.*(or|price|change))|(change.*(depending|requirement|feature|extra|scope))|(can it change)|(is that fixed)|(is it fixed)|(fixed da)|(wenas wenawada)|(ganan wenas)|(change aaguma)|(price fixed)|(fixed-aa)|(ස්ථිරද)|(වෙනස් වෙනවද)|(மாறுமா)|(நிலையானதா)/i.test(
+      normalized
+    ) ||
+    (normalized.includes("fixed") && (normalized.includes("price") || normalized.includes("change") || normalized.includes("requirement") || normalized.includes("or"))) ||
+    (normalized.includes("change") && (normalized.includes("requirement") || normalized.includes("price") || normalized.includes("depending"))) ||
+    (normalized.includes("wenas") && (normalized.includes("price") || normalized.includes("ganan") || normalized.includes("eke") || normalized.includes("requirements"))) ||
+    (normalized.includes("change aagum") || normalized.includes("change aaguma")) ||
+    (normalized.includes("මිල") && normalized.includes("වෙනස්")) ||
+    (normalized.includes("விலை") && normalized.includes("மாறுமா"))
+  );
+}
+
+/**
+ * Checks if a message is asking about deliverables, inclusions, or what's included in a package.
+ */
+function isPackageInclusionInquiry(normalized: string): boolean {
+  return (
+    /(what.*(included|inclusions|get|comes with))|(explain.*(included|inclusions|package|features))|(what is included)|(what's included)|(whats included)|(what do i get)|(inclusions)|(include wenne)|(include venney)|(monawada include)|(monada include)|(monawada hambenne)|(include aagum)|(enna include)|(enna kedaikkum)|(ඇතුළත්)|(ලැබෙන්නේ)|(அடங்கும்)|(கிடைக்கும்)/i.test(
+      normalized
+    ) ||
+    normalized.includes("what is included") ||
+    normalized.includes("what's included") ||
+    normalized.includes("whats included") ||
+    normalized.includes("include wenne") ||
+    normalized.includes("include aagum") ||
+    normalized.includes("monawada include") ||
+    normalized.includes("enna include") ||
+    normalized.includes("inclusions")
+  );
 }
 
 /**
@@ -405,7 +526,7 @@ function getRelevantServicesContext(
       // Flagship packages across ALL core categories (including TikTok!)
       const flagshipSlugs = new Set([
         "brd-pkg-01", "brd-pkg-02", "brd-pkg-03", // Branding
-        "web-pkg-01", "web-pkg-02", "web-pkg-03", // Website
+        "web-pkg-01", "web-pkg-02", "web-pkg-03", "web-pkg-04", // Website
         "smm-pkg-01a", "smm-pkg-02a", "smm-pkg-03a", // Social Media
         "ttk-pkg-01", "ttk-pkg-02", "ttk-pkg-03", // TikTok
       ]);
@@ -429,7 +550,7 @@ function getRelevantServicesContext(
         if (s.inclusions) {
           const arr = JSON.parse(s.inclusions);
           if (Array.isArray(arr) && arr.length > 0) {
-            inclusionsText = ` | Includes: ${arr.slice(0, 4).join(", ")}`;
+            inclusionsText = ` | Includes: ${arr.join(", ")}`;
           }
         }
       } catch {}
@@ -572,11 +693,12 @@ async function getWebsiteFallbackReply(
   history: Array<{ role: "assistant" | "user"; content: string }> = []
 ): Promise<HiveResponse> {
   const normalized = message.toLowerCase().trim();
-  const profile = await getWebsiteLiveCompanyProfile();
+  const { profile, services: allServices } = await getWebsiteBrainData();
   const recentTopic = getRecentTopicContext(history);
   const currentTopic = getRecentTopicContext([{ role: "user", content: message }]);
   const effectiveTopic = recentTopic || currentTopic;
   const langStyle = detectLanguageStyle(message, history);
+  const activePackage = getActivePackageFromHistory(history, allServices);
 
   // 1. Inexperienced / Non-Technical Customer Statements
   if (
@@ -625,6 +747,146 @@ async function getWebsiteFallbackReply(
       needsLeadCapture: false,
       suggestedAction: "Tell us about your business",
     };
+  }
+
+  // 1.5 Package Pricing Flexibility & "Is that price fixed" Inquiries
+  if (isPriceFlexibilityInquiry(normalized)) {
+    let targetPackage = activePackage;
+    if (!targetPackage) {
+      if (normalized.includes("starter") && (normalized.includes("website") || effectiveTopic === "website")) {
+        targetPackage = allServices.find((s) => s.slug === "web-pkg-01") || null;
+      } else if (normalized.includes("business") && (normalized.includes("website") || effectiveTopic === "website")) {
+        targetPackage = allServices.find((s) => s.slug === "web-pkg-02") || null;
+      } else if (normalized.includes("corporate") && (normalized.includes("website") || effectiveTopic === "website")) {
+        targetPackage = allServices.find((s) => s.slug === "web-pkg-03") || null;
+      } else if (effectiveTopic === "website") {
+        targetPackage = allServices.find((s) => s.slug === "web-pkg-01") || null;
+      }
+    }
+
+    if (targetPackage && (targetPackage.category === "website" || targetPackage.slug.startsWith("web-"))) {
+      const pkgName = targetPackage.name;
+      const startPrice = targetPackage.startingPrice
+        ? `LKR ${targetPackage.startingPrice.toLocaleString()}`
+        : "LKR 35,000";
+      const isStarter = targetPackage.slug === "web-pkg-01";
+      const scopeDescEn = isStarter
+        ? "up to 5 pages, responsive design, contact form, basic SEO, and Google Maps"
+        : `${pkgName} standard features`;
+      const scopeDescSi = isStarter
+        ? "pages 5k, responsive design, contact form, basic SEO, Google Maps"
+        : `${pkgName} standard features`;
+
+      if (langStyle === "singlish") {
+        return {
+          reply: `${pkgName} package eke ${startPrice} kiyanne starting price eka 😊 Standard package scope ekata (${scopeDescSi}) e ganama thamai. Habai oyata extra pages hari custom features hari one unoth requirements anuwa final price eka wenas wenna puluwan. Oyage requirements monawada kiyanna puluwanda?`,
+          needsLeadCapture: false,
+          suggestedAction: "Tell us your requirements",
+        };
+      }
+      if (langStyle === "tanglish") {
+        return {
+          reply: `${pkgName} package-ku ${startPrice} dhaan starting price 😊 Standard package scope-ku (${scopeDescSi}) adhe price dhaan. Aana extra pages illa custom features theva pattaal requirements poruthu final price change aagalaam. Ungalukku enna extra features theva?`,
+          needsLeadCapture: false,
+          suggestedAction: "Tell us your requirements",
+        };
+      }
+      if (langStyle === "sinhala") {
+        return {
+          reply: `${pkgName} package එක සඳහා ${startPrice} කියන්නේ starting price එක 😊 Standard package එකේ තියෙන දේවල් සඳහා (${scopeDescSi}) ඒ මිලම අදාළ වෙනවා. නමුත් ඔබට extra pages හෝ custom features අවශ්‍ය වුවහොත් requirements අනුව මිල වෙනස් විය හැකියි. ඔබට අවශ්‍ය විශේෂාංග මොනවද?`,
+          needsLeadCapture: false,
+          suggestedAction: "Tell us your requirements",
+        };
+      }
+      if (langStyle === "tamil") {
+        return {
+          reply: `${pkgName} package-க்கு ${startPrice} என்பது ஆரம்ப விலை (starting price) ஆகும் 😊 Standard package scope-க்கு (${scopeDescSi}) அதே விலைதான். ஆனால் கூடுதல் பக்கங்கள் அல்லது custom features தேவைப்பட்டால் requirements-க்கு ஏற்ப இறுதி விலை மாறலாம். உங்களுக்கு என்ன அம்சங்கள் தேவை?`,
+          needsLeadCapture: false,
+          suggestedAction: "Tell us your requirements",
+        };
+      }
+      return {
+        reply: `The ${startPrice} price for our ${pkgName} is a starting price 😊 It covers the standard scope (${scopeDescEn}). The final price may change if you need extra pages, custom features, or integrations beyond that scope. What specific requirements or extra features do you have in mind?`,
+        needsLeadCapture: false,
+        suggestedAction: "Tell us your requirements",
+      };
+    }
+  }
+
+  // 1.8 Package Deliverables & Inclusions Lookups (Starter Website, Business Website, etc.)
+  if (isPackageInclusionInquiry(normalized)) {
+    const isStarter =
+      normalized.includes("starter") ||
+      (activePackage?.slug === "web-pkg-01" &&
+        (normalized.includes("in that") || normalized.includes("this package") || normalized.includes("eke") || normalized.includes("la")));
+    const isBusiness =
+      normalized.includes("business") ||
+      (activePackage?.slug === "web-pkg-02" &&
+        (normalized.includes("in that") || normalized.includes("this package")));
+    const isCorporate =
+      normalized.includes("corporate") ||
+      (activePackage?.slug === "web-pkg-03" &&
+        (normalized.includes("in that") || normalized.includes("this package")));
+    const isCustomWeb =
+      normalized.includes("custom") && (normalized.includes("web") || effectiveTopic === "website");
+
+    if (isStarter || isBusiness || isCorporate || isCustomWeb || effectiveTopic === "website" || normalized.includes("website") || normalized.includes("web")) {
+      const targetSlug = isCorporate ? "web-pkg-03" : isBusiness ? "web-pkg-02" : isCustomWeb ? "web-pkg-04" : "web-pkg-01";
+      const pkg = allServices.find((s) => s.slug === targetSlug) || allServices.find((s) => s.slug === "web-pkg-01");
+      if (pkg) {
+        let incArr: string[] = [];
+        try {
+          if (pkg.inclusions) incArr = JSON.parse(pkg.inclusions);
+        } catch {}
+        if (incArr.length === 0) {
+          if (pkg.slug === "web-pkg-01") incArr = ["Up to 5 Pages", "Responsive Design", "Contact Form", "Basic SEO", "Google Maps"];
+          else if (pkg.slug === "web-pkg-02") incArr = ["Up to 10 Pages", "Premium UI", "CMS Integration", "Advanced SEO", "Blog", "Analytics"];
+          else if (pkg.slug === "web-pkg-03") incArr = ["Unlimited Pages", "Custom UI/UX", "Performance Optimization", "Advanced SEO", "Security", "Speed Optimization"];
+          else if (pkg.slug === "web-pkg-04") incArr = ["Custom Features", "Business Systems", "Dashboards", "API Integration", "Database Design", "Enterprise Development"];
+        }
+
+        const incTextEn = incArr.slice(0, -1).join(", ") + ", and " + incArr.slice(-1);
+        const incTextSi = incArr.slice(0, -1).join(", ") + ", saha " + incArr.slice(-1);
+        const incTextTa = incArr.slice(0, -1).join(", ") + ", and " + incArr.slice(-1);
+        const incTextSinhala = incArr.slice(0, -1).join(", ") + ", සහ " + incArr.slice(-1);
+        const incTextTamil = incArr.slice(0, -1).join(", ") + ", மற்றும் " + incArr.slice(-1);
+        const displayPrice = formatBrainPriceDisplay(pkg);
+
+        if (langStyle === "singlish") {
+          return {
+            reply: `${pkg.name} package eke (${displayPrice}) ${incTextSi} labenawa 😊 Thawa details balamuda?`,
+            needsLeadCapture: false,
+            suggestedAction: `Ask about ${pkg.name}`,
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: `${pkg.name} package-la (${displayPrice}) ${incTextTa} kedaikkum 😊 Idhoda details paakkalaama?`,
+            needsLeadCapture: false,
+            suggestedAction: `Ask about ${pkg.name}`,
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: `${pkg.name} package එකට (${displayPrice}) ${incTextSinhala} ඇතුළත් වෙනවා 😊 වැඩිදුර විස්තර දැනගන්න කැමතිද?`,
+            needsLeadCapture: false,
+            suggestedAction: `Ask about ${pkg.name}`,
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: `${pkg.name} package-ல் (${displayPrice}) ${incTextTamil} கிடைக்கும் 😊 மேலும் விவரங்கள் பார்க்கலாமா?`,
+            needsLeadCapture: false,
+            suggestedAction: `Ask about ${pkg.name}`,
+          };
+        }
+        return {
+          reply: `Our ${pkg.name} package (${displayPrice}) includes: ${incTextEn} 😊 Would you like to get started with this package or have any questions?`,
+          needsLeadCapture: false,
+          suggestedAction: `Ask about ${pkg.name}`,
+        };
+      }
+    }
   }
 
   // 2. Contextual & Referential Follow-ups across languages
@@ -900,36 +1162,38 @@ async function getWebsiteFallbackReply(
         normalized.includes("hambenne") ||
         normalized.includes("என்ன கிடைக்கும்")
       ) {
+        const pkg = allServices.find((s) => s.slug === "web-pkg-01");
+        const priceStr = pkg ? formatBrainPriceDisplay(pkg) : "From LKR 35,000";
         if (langStyle === "singlish") {
           return {
-            reply: "Starter Website package eke (LKR 35,000) pages 5k, fully responsive mobile design, contact inquiry form, WhatsApp chat integration, basic SEO saha Google Maps labenawa 😊 Thawa details balamuda?",
+            reply: `Starter Website package eke (${priceStr}) Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, saha Google Maps labenawa 😊 Thawa details balamuda?`,
             needsLeadCapture: false,
             suggestedAction: "Ask about Starter Website",
           };
         }
         if (langStyle === "tanglish") {
           return {
-            reply: "Starter Website package-la (LKR 35,000) 5 pages, mobile responsive design, contact form, WhatsApp chat integration, basic SEO and Google Maps kedaikkum 😊 Innum details paakkalaama?",
+            reply: `Starter Website package-la (${priceStr}) Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, and Google Maps kedaikkum 😊 Idhoda details paakkalaama?`,
             needsLeadCapture: false,
             suggestedAction: "Ask about Starter Website",
           };
         }
         if (langStyle === "sinhala") {
           return {
-            reply: "Starter Website package එකට (LKR 35,000) pages 5ක්, mobile responsive design, contact form, WhatsApp chat integration, basic SEO සහ Google Maps ඇතුළත් වෙනවා 😊 වැඩිදුර විස්තර දැනගන්න කැමතිද?",
+            reply: `Starter Website package එකට (${priceStr}) Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, සහ Google Maps ඇතුළත් වෙනවා 😊 වැඩිදුර විස්තර දැනගන්න කැමතිද?`,
             needsLeadCapture: false,
             suggestedAction: "Ask about Starter Website",
           };
         }
         if (langStyle === "tamil") {
           return {
-            reply: "Starter Website package-ல் (LKR 35,000) 5 pages, mobile responsive design, contact form, WhatsApp chat integration, basic SEO மற்றும் Google Maps கிடைக்கும் 😊 மேலும் விவரங்கள் பார்க்கலாமா?",
+            reply: `Starter Website package-ல் (${priceStr}) Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, மற்றும் Google Maps கிடைக்கும் 😊 மேலும் விவரங்கள் பார்க்கலாமா?`,
             needsLeadCapture: false,
             suggestedAction: "Ask about Starter Website",
           };
         }
         return {
-          reply: "Our Starter Website package (from LKR 35,000) includes up to 5 pages, fully responsive mobile design, contact inquiry form, WhatsApp chat integration, basic SEO setup, and Google Maps integration 😊 Would you like to get started with this package?",
+          reply: `Our Starter Website package (${priceStr}) includes: Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, and Google Maps 😊 Would you like to get started with this package?`,
           needsLeadCapture: false,
           suggestedAction: "Ask about Starter Website",
         };
@@ -943,57 +1207,118 @@ async function getWebsiteFallbackReply(
         normalized.includes("දෙවෙනි") ||
         normalized.includes("இரண்டாவது")
       ) {
+        const pkg = allServices.find((s) => s.slug === "web-pkg-02");
+        const priceStr = pkg ? formatBrainPriceDisplay(pkg) : "From LKR 75,000";
         if (langStyle === "singlish") {
           return {
-            reply: "Business Website package eka LKR 75,000 indala thiyenawa. Pages 10k, premium UI, dynamic CMS, blog, advanced SEO saha analytics labenawa 😊",
+            reply: `Business Website package eke (${priceStr}) Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, saha Analytics labenawa 😊`,
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Business Website",
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: `Business Website package-la (${priceStr}) Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, and Analytics kedaikkum 😊`,
             needsLeadCapture: false,
             suggestedAction: "Ask about Business Website",
           };
         }
         if (langStyle === "sinhala") {
           return {
-            reply: "Business Website package එක LKR 75,000 සිට පවතී. Pages 10ක්, premium UI, dynamic CMS, blog, advanced SEO සහ analytics ඇතුළත් වේ 😊",
+            reply: `Business Website package එකට (${priceStr}) Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, සහ Analytics ඇතුළත් වේ 😊`,
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Business Website",
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: `Business Website package-ல் (${priceStr}) Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, மற்றும் Analytics கிடைக்கும் 😊`,
             needsLeadCapture: false,
             suggestedAction: "Ask about Business Website",
           };
         }
         return {
-          reply: "Our Business Website package (from LKR 75,000) includes up to 10 pages, premium UI design, dynamic CMS integration, blog setup, advanced SEO, and analytics 😊",
+          reply: `Our Business Website package (${priceStr}) includes: Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, and Analytics 😊`,
           needsLeadCapture: false,
           suggestedAction: "Ask about Business Website",
         };
       }
 
+      // Inquiries about corporate website package
+      if (
+        normalized.includes("corporate") ||
+        normalized.includes("third") ||
+        normalized.includes("enterprise") ||
+        normalized.includes("තුන්වෙනි") ||
+        normalized.includes("மூன்றாவது")
+      ) {
+        const pkg = allServices.find((s) => s.slug === "web-pkg-03");
+        const priceStr = pkg ? formatBrainPriceDisplay(pkg) : "From LKR 150,000";
+        if (langStyle === "singlish") {
+          return {
+            reply: `Corporate Website package eke (${priceStr}) Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, saha Speed Optimization labenawa 😊`,
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Corporate Website",
+          };
+        }
+        if (langStyle === "tanglish") {
+          return {
+            reply: `Corporate Website package-la (${priceStr}) Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, and Speed Optimization kedaikkum 😊`,
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Corporate Website",
+          };
+        }
+        if (langStyle === "sinhala") {
+          return {
+            reply: `Corporate Website package එකට (${priceStr}) Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, සහ Speed Optimization ඇතුළත් වේ 😊`,
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Corporate Website",
+          };
+        }
+        if (langStyle === "tamil") {
+          return {
+            reply: `Corporate Website package-ல் (${priceStr}) Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, மற்றும் Speed Optimization கிடைக்கும் 😊`,
+            needsLeadCapture: false,
+            suggestedAction: "Ask about Corporate Website",
+          };
+        }
+        return {
+          reply: `Our Corporate Website package (${priceStr}) includes: Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, and Speed Optimization 😊`,
+          needsLeadCapture: false,
+          suggestedAction: "Ask about Corporate Website",
+        };
+      }
+
       if (langStyle === "singlish") {
         return {
-          reply: "Sure 😊 Website packages 3k thiyenawa:\n\n• Starter Website (LKR 35,000 indala) — Pages 5k, mobile-friendly.\n• Business Website (LKR 75,000 indala) — Pages 10k, full management ekka.\n• Corporate (LKR 150,000 indala) — Custom built platform ekak.\n\nOyalata aluth website ekakda one?",
+          reply: "Sure 😊 Website packages 4k thiyenawa:\n\n• Starter Website (LKR 35,000 indala) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 indala) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 indala) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nOyalage business ekata galapena eka balamuda?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website packages",
         };
       }
       if (langStyle === "tanglish") {
         return {
-          reply: "Sure 😊 Website packages irukku:\n\n• Starter Website (LKR 35,000 la irundhu) — 5 pages, mobile-friendly.\n• Business Website (LKR 75,000 la irundhu) — 10 pages with full features.\n• Corporate (LKR 150,000 la irundhu) — Custom multi-page build.\n\nPudhu website thevaiaa?",
+          reply: "Sure 😊 Namma 4 website packages offer panrom:\n\n• Starter Website (LKR 35,000 la irundhu) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 la irundhu) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 la irundhu) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nUnga business-ku edhu suit aagum nu paakkalaama?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website packages",
         };
       }
       if (langStyle === "sinhala") {
         return {
-          reply: "Sure 😊 Website packages 3ක් තියෙනවා:\n\n• Starter Website (LKR 35,000 සිට) — Pages 5ක්, mobile-friendly.\n• Business Website (LKR 75,000 සිට) — Pages 10ක්, සම්පූර්ණ කළමනාකරණය සමඟ.\n• Corporate (LKR 150,000 සිට) — Custom platform එකක්.\n\nඔබට අලුත් website එකක්ද අවශ්‍ය?",
+          reply: "Sure 😊 අපේ website packages 4ක් තියෙනවා:\n\n• Starter Website (LKR 35,000 සිට) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 සිට) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 සිට) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nඔබගේ ව්‍යාපාරයට ගැලපෙන package එක බලමුද?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website packages",
         };
       }
       if (langStyle === "tamil") {
         return {
-          reply: "Sure 😊 Website packages இருக்கு:\n\n• Starter Website (LKR 35,000 முதல்) — 5 pages, mobile-friendly.\n• Business Website (LKR 75,000 முதல்) — 10 pages with full features.\n• Corporate (LKR 150,000 முதல்) — Custom multi-page build.\n\nபுதிய website தேவையா?",
+          reply: "Sure 😊 எங்களிடம் 4 website packages உள்ளன:\n\n• Starter Website (LKR 35,000 முதல்) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 முதல்) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 முதல்) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nஎந்த package பார்க்க விரும்புகிறீர்கள்?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website packages",
         };
       }
       return {
-        reply: "Sure 😊 We have a few website options:\n\n• Starter Website (from LKR 35,000) — Up to 5 pages, mobile-friendly, great for small businesses.\n• Business Website (from LKR 75,000) — Up to 10 pages with full content management.\n• Corporate / Custom (from LKR 150,000) — Tailored multi-page build with custom features.\n\nAre you looking for a brand-new website or a redesign?",
+        reply: "Sure 😊 We offer 4 website packages:\n\n• Starter Website (from LKR 35,000) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (from LKR 75,000) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (from LKR 150,000) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nWhich package sounds like the best fit for your project?",
         needsLeadCapture: false,
         suggestedAction: "Ask for a website recommendation",
       };
@@ -1675,34 +2000,34 @@ async function getWebsiteFallbackReply(
     ) {
       if (langStyle === "singlish") {
         return {
-          reply: "Sure 😊 Ape website packages LKR 35,000 (Starter Website - pages 5k) indala LKR 150,000 (Corporate Website) wenakam thiyenawa. Business Website eka LKR 75,000 wenawa. Custom platforms walatath api solutions denawa. Oyalata one details tika mama kiyannada?",
+          reply: "Sure 😊 Ape website packages 4k thiyenawa:\n\n• Starter Website (LKR 35,000 indala) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 indala) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 indala) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nOyalage business ekata galapena eka balamuda?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website package details",
         };
       }
       if (langStyle === "tanglish") {
         return {
-          reply: "Sure 😊 Namma website packages LKR 35,000 (Starter Website - 5 pages) la irundhu LKR 150,000 (Corporate Website) varaikkum irukku. Business Website LKR 75,000 varum. Ungalukku enna theva nu sonnaa correct package solren.",
+          reply: "Sure 😊 Namma 4 website packages offer panrom:\n\n• Starter Website (LKR 35,000 la irundhu) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 la irundhu) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 la irundhu) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nUnga business-ku edhu suit aagum nu paakkalaama?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website package details",
         };
       }
       if (langStyle === "sinhala") {
         return {
-          reply: "අපේ website packages LKR 35,000 (Starter Website - pages 5ක්) සිට LKR 150,000 (Corporate Website) දක්වා තියෙනවා 😊 Business Website එක LKR 75,000 වෙනවා. විස්තර දැනගන්න කැමතිද?",
+          reply: "අපේ website packages 4ක් තියෙනවා 😊\n\n• Starter Website (LKR 35,000 සිට) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 සිට) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 සිට) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nවිස්තර දැනගන්න කැමතිද?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website package details",
         };
       }
       if (langStyle === "tamil") {
         return {
-          reply: "எங்க website packages LKR 35,000 (Starter Website - 5 pages) முதல் LKR 150,000 (Corporate Website) வரை இருக்கு 😊 Business Website LKR 75,000 வரும். விவரங்கள் சொல்லவா?",
+          reply: "எங்களிடம் 4 website packages உள்ளன 😊\n\n• Starter Website (LKR 35,000 முதல்) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (LKR 75,000 முதல்) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (LKR 150,000 முதல்) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nவிவரங்கள் சொல்லவா?",
           needsLeadCapture: false,
           suggestedAction: "Ask about website package details",
         };
       }
       return {
-        reply: "Sure 😊 Our website packages start from LKR 35,000 for Starter (up to 5 pages), LKR 75,000 for Business (up to 10 pages with CMS & blog), and LKR 150,000 for Corporate (tailored multi-page build). We also build custom web solutions. Would you like details on what's included?",
+        reply: "Sure 😊 We offer 4 website packages:\n\n• Starter Website (from LKR 35,000) — Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, Google Maps.\n• Business Website (from LKR 75,000) — Up to 10 Pages, Premium UI, CMS Integration, Advanced SEO, Blog, Analytics.\n• Corporate Website (from LKR 150,000) — Unlimited Pages, Custom UI/UX, Performance Optimization, Advanced SEO, Security, Speed Optimization.\n• Custom Web Solution (Custom Quote) — Custom Features, Business Systems, Dashboards, API Integration, Database Design, Enterprise Development.\n\nWhich package sounds like the best fit for your project?",
         needsLeadCapture: false,
         suggestedAction: "Ask about website package details",
       };
@@ -1717,7 +2042,7 @@ async function getWebsiteFallbackReply(
           const displayPrice = pricingResult.displayPrice;
           const inclusionsText =
             pricingResult.inclusions && pricingResult.inclusions.length > 0
-              ? ` It includes: ${pricingResult.inclusions.slice(0, 3).join(", ")}.`
+              ? ` It includes: ${pricingResult.inclusions.join(", ")}.`
               : "";
 
           if (langStyle === "singlish") {
@@ -2299,8 +2624,15 @@ COMMUNICATE LIKE A REAL HUMAN:
 
 CONVERSATIONAL CONTEXT & PRONOUNS:
 - Pay close attention to previous messages.
-- If the customer uses words like "they", "it", "that", "those", "the first one", "how much?", "what are they?", "packages monawada?", "eka keeyada?", "පැකේජ් මොනවද?", "ඒක කීයද?", "adhu evlo?", resolve them using the previous conversation context. Never restart or treat follow-ups as disconnected.
+- If the customer uses words like "they", "it", "that", "those", "that price", "the first one", "how much?", "what are they?", "packages monawada?", "eka keeyada?", "පැකේජ් මොනවද?", "ඒක කීයද?", "adhu evlo?", resolve them using the previous conversation context. Never restart or treat follow-ups as disconnected.
 - If a short follow-up genuinely cannot be resolved from context, ask a short, natural clarification instead of guessing or answering an unrelated topic.
+
+PACKAGE PRICING FLEXIBILITY & SCOPE QUESTIONS:
+- When a customer asks whether "that price" is fixed or can change (e.g., "Is that price fixed, or can it change depending on my requirements?", "fixed da?", "ganan wenas wenawada?", "price change aaguma?"):
+  • Immediately resolve "that price" to the package currently discussed (e.g. Starter Website).
+  • Explicitly explain that for packages with a starting price (e.g., Starter Website from LKR 35,000), LKR 35,000 is the starting rate for the package's standard scope (up to 5 pages, responsive design, contact form, basic SEO, and Google Maps).
+  • Explain that the price remains at that rate for standard features, but may change/adjust if their requirements or custom features go beyond that package scope.
+  • NEVER switch away to generic service recommendations or say "We offer straightforward pricing across our branding, website, and social media services...". Answer the pricing question directly.
 
 PLATFORM ISOLATION & ACCURACY (CRITICAL):
 - If the customer asks about TikTok, TikTok videos, or TikTok packages, ONLY present and quote TikTok video packages from the catalog below (Single Video LKR 5,000, Growth 4 videos/month LKR 18,000, Premium 8 videos/month LKR 32,000, Additional Video LKR 5,000). NEVER quote Facebook, Instagram, or SMM post packages for TikTok inquiries.
@@ -2328,6 +2660,12 @@ Return valid JSON with keys:
 - "suggestedAction": (string, optional) Brief helpful action label.
 
 CONVERSATION EXAMPLES (FOLLOW THESE PATTERNS):
+
+[Website Pricing Follow-up Example]
+Customer: "Please explain what's included in the Starter Website package."
+Hive: "Our Starter Website package (from LKR 35,000) includes: Up to 5 Pages, Responsive Design, Contact Form, Basic SEO, and Google Maps 😊 Would you like to get started with this package?"
+Customer: "Is that price fixed, or can it change depending on my requirements?"
+Hive: "The LKR 35,000 is our starting price for the standard package scope 😊 It stays at LKR 35,000 if your website fits within the 5 pages and standard features. If you need extra pages, custom features, or integrations beyond that scope, the price can adjust depending on your requirements. What specific features do you have in mind?"
 
 [TikTok Example]
 Customer: "tiktok packages monawada?"

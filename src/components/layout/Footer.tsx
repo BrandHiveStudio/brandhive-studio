@@ -26,6 +26,12 @@ const footerLinks = {
     { name: "Insights", href: "/insights" },
     { name: "Contact", href: "/contact" },
   ],
+  legal: [
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms & Conditions", href: "/terms" },
+    { name: "Cookie Policy", href: "/cookie-policy" },
+    { name: "Refund & Cancellation", href: "/refund-policy" },
+  ],
 };
 
 interface SocialItem {
@@ -197,10 +203,12 @@ export default function Footer() {
       phoneLabel: phoneRecord?.label && !phoneRecord.label.toLowerCase().includes("phone")
         ? phoneRecord.label
         : (phoneRecord?.url.replace("tel:", "") || "+94 70 641 0093"),
-      emailUrl: emailRecord?.url || "mailto:brandhive.studio.lk@gmail.com",
-      emailLabel: emailRecord?.label && !emailRecord.label.toLowerCase().includes("email")
+      emailUrl: (emailRecord?.url && !emailRecord.url.includes("brandhive.studio.lk@gmail.com"))
+        ? emailRecord.url
+        : "mailto:info@brandhivestudio.com.lk",
+      emailLabel: (emailRecord?.label && !emailRecord.label.toLowerCase().includes("email") && !emailRecord.label.includes("brandhive.studio.lk@gmail.com"))
         ? emailRecord.label
-        : (emailRecord?.url.replace("mailto:", "") || "brandhive.studio.lk@gmail.com"),
+        : ((emailRecord?.url && !emailRecord.url.includes("brandhive.studio.lk@gmail.com")) ? emailRecord.url.replace("mailto:", "") : "info@brandhivestudio.com.lk"),
       whatsappUrl: whatsappRecord?.url || "https://wa.me/94706410093",
     };
   }, [linksData]);
@@ -221,8 +229,8 @@ export default function Footer() {
           {/* Desktop View (Flex percentages for exact proportions) */}
           <div className="hidden lg:flex flex-row items-start justify-between w-full pb-2">
 
-            {/* Column 1: Brand Column (35%) */}
-            <div className="w-[35%] flex flex-col items-start justify-start relative">
+            {/* Column 1: Brand Column (28%) */}
+            <div className="w-[28%] flex flex-col items-start justify-start relative">
               {/* Subtle ambient cyan glow behind the Brand logo */}
               <motion.div
                 animate={{
@@ -327,8 +335,8 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Column 2: EXPLORE (18%) */}
-            <div className="w-[18%] flex flex-col gap-5 justify-start">
+            {/* Column 2: EXPLORE (15%) */}
+            <div className="w-[15%] flex flex-col gap-5 justify-start">
               <span className="text-[10px] font-bold uppercase tracking-widest text-white">
                 EXPLORE
               </span>
@@ -346,8 +354,8 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Column 3: EXPERTISE (22%) */}
-            <div className="w-[22%] flex flex-col gap-5 justify-start">
+            {/* Column 3: EXPERTISE (18%) */}
+            <div className="w-[18%] flex flex-col gap-5 justify-start">
               <span className="text-[10px] font-bold uppercase tracking-widest text-white">
                 EXPERTISE
               </span>
@@ -365,8 +373,27 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Column 4: GET IN TOUCH (25%) */}
-            <div className="w-[25%] flex flex-col gap-5 justify-start">
+            {/* Column 4: LEGAL & POLICIES (18%) */}
+            <div className="w-[18%] flex flex-col gap-5 justify-start">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white">
+                LEGAL &amp; POLICIES
+              </span>
+              <ul className="flex flex-col gap-3">
+                {footerLinks.legal.map((link, idx) => (
+                  <li key={idx}>
+                    <Link
+                      href={link.href}
+                      className="text-xs text-white/50 hover:text-[#16C7FF] transition-all duration-250 ease-out hover:translate-x-0.5 inline-block"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 5: GET IN TOUCH (21%) */}
+            <div className="w-[21%] flex flex-col gap-5 justify-start">
               <span className="text-[10px] font-bold uppercase tracking-widest text-white">
                 GET IN TOUCH
               </span>
@@ -489,6 +516,25 @@ export default function Footer() {
               </span>
               <ul className="grid grid-cols-2 gap-2">
                 {footerLinks.services.map((link, idx) => (
+                  <li key={idx}>
+                    <Link
+                      href={link.href}
+                      className="text-xs text-white/50 hover:text-[#16C7FF] transition-colors duration-200"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* LEGAL & POLICIES */}
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white">
+                LEGAL &amp; POLICIES
+              </span>
+              <ul className="grid grid-cols-2 gap-2">
+                {footerLinks.legal.map((link, idx) => (
                   <li key={idx}>
                     <Link
                       href={link.href}

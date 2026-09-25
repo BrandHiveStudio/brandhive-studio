@@ -3,7 +3,7 @@ import { getPublishedProjects } from "@/lib/db/queries/projects";
 import { getPublishedPosts } from "@/lib/db/queries/posts";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://brandhivestudio.com.lk";
+  const baseUrl = "https://www.brandhivestudio.com.lk";
 
   // Static core routes
   const routes = [
@@ -14,6 +14,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/process",
     "/insights",
     "/contact",
+    "/privacy-policy",
+    "/terms",
+    "/cookie-policy",
+    "/refund-policy",
   ];
 
   // Baseline fallback portfolio slugs
@@ -40,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
-    priority: route === "" ? 1.0 : 0.8,
+    priority: route === "" ? 1.0 : (["/privacy-policy", "/terms", "/cookie-policy", "/refund-policy"].includes(route) ? 0.5 : 0.8),
   }));
 
   // Fetch dynamic published projects

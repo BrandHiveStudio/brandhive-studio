@@ -190,7 +190,7 @@ export default function ContactClient() {
                 </div>
                 <div>
                   <span className="text-[9px] font-bold tracking-widest text-white/40 uppercase">Email</span>
-                  <p className="text-sm font-semibold text-white/90 mt-0.5 break-all">brandhive.studio.lk@gmail.com</p>
+                  <p className="text-sm font-semibold text-white/90 mt-0.5 break-all">info@brandhivestudio.com.lk</p>
                 </div>
               </motion.div>
 
@@ -456,6 +456,17 @@ export default function ContactClient() {
                                 )}
                               </button>
                             </motion.div>
+
+                            {/* Privacy Notice */}
+                            <p className="text-[11px] sm:text-xs text-white/50 leading-relaxed text-center sm:text-left px-1">
+                              By submitting this form, you acknowledge that BrandHive Studio may use the information provided to respond to your enquiry and manage your request.{" "}
+                              <Link
+                                href="/privacy-policy"
+                                className="text-[#16C7FF] hover:text-[#60D6FF] underline font-medium transition-colors"
+                              >
+                                Privacy Policy
+                              </Link>
+                            </p>
 
                             {/* WhatsApp Button */}
                             <a

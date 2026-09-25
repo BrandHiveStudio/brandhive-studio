@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/admin/"],
     },
-    sitemap: "https://brandhivestudio.com.lk/sitemap.xml",
+    sitemap: "https://www.brandhivestudio.com.lk/sitemap.xml",
   };
 }

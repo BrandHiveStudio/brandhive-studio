@@ -11,6 +11,7 @@ import PageTransitionProvider from "@/components/providers/PageTransitionProvide
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import CookieConsent from "@/components/privacy/CookieConsent";
 
 interface ClientOverlaysProps {
   children: ReactNode;
@@ -40,6 +41,7 @@ export default function ClientOverlays({ children }: ClientOverlaysProps) {
         <CinematicBackground />
         <PageTransitionProvider>{children}</PageTransitionProvider>
         <DeferredFloatingChatbot />
+        <CookieConsent />
       </ClientSetupProvider>
     </ScrollProvider>
   );
