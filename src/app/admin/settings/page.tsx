@@ -18,6 +18,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 export default function AdminSettingsPage() {
   const router = useRouter();
@@ -220,13 +221,12 @@ export default function AdminSettingsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-white/70 mb-1">Current Password (to confirm)</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     value={emailCurrentPassword}
                     onChange={(e) => setEmailCurrentPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs placeholder:text-white/30 focus:outline-none focus:border-[#16C7FF] transition-colors"
+                    iconSize="sm"
                   />
                 </div>
 
@@ -279,37 +279,34 @@ export default function AdminSettingsPage() {
               <form onSubmit={handleChangePassword} className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-white/70 mb-1">Current Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     value={pwdCurrentPassword}
                     onChange={(e) => setPwdCurrentPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs placeholder:text-white/30 focus:outline-none focus:border-[#16C7FF] transition-colors"
+                    iconSize="sm"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-white/70 mb-1">New Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     value={pwdNewPassword}
                     onChange={(e) => setPwdNewPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs placeholder:text-white/30 focus:outline-none focus:border-[#16C7FF] transition-colors"
+                    iconSize="sm"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-white/70 mb-1">Confirm New Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     value={pwdConfirmPassword}
                     onChange={(e) => setPwdConfirmPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs placeholder:text-white/30 focus:outline-none focus:border-[#16C7FF] transition-colors"
+                    iconSize="sm"
                   />
                 </div>
 

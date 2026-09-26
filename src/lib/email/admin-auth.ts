@@ -1,12 +1,34 @@
-import { Resend } from "resend";
+import nodemailer, { type Transporter } from "nodemailer";
 
-function getResendClient(): Resend | null {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return null;
-  return new Resend(apiKey);
+function getSmtpTransporter(): Transporter | null {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+  const port = Number(process.env.SMTP_PORT || 587);
+
+  if (!host || !user || !pass) {
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465, // true for port 465 (SSL), false for port 587 (STARTTLS)
+    auth: {
+      user,
+      pass,
+    },
+  });
 }
 
-const EMAIL_SENDER = "BrandHive Studio <onboarding@resend.dev>";
+function getSender(): string {
+  return (
+    process.env.SMTP_FROM ||
+    (process.env.SMTP_USER
+      ? `BrandHive Studio <${process.env.SMTP_USER}>`
+      : "BrandHive Studio <brandhive.studio.lk@gmail.com>")
+  );
+}
 
 interface SendPasswordResetParams {
   to: string;
@@ -21,17 +43,17 @@ interface SendEmailVerificationParams {
 }
 
 /**
- * Dispatches a cryptographically secure password reset link to an administrative user.
+ * Dispatches a cryptographically secure password reset link to an administrative user via SMTP.
  */
 export async function sendPasswordResetEmail({
   to,
   resetUrl,
   adminName,
 }: SendPasswordResetParams): Promise<{ success: boolean; error?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    console.warn("⚠️ RESEND_API_KEY not configured. Password reset email was not dispatched.");
-    return { success: false, error: "Email delivery service unavailable." };
+  const transporter = getSmtpTransporter();
+  if (!transporter) {
+    console.warn("⚠️ SMTP credentials not fully configured (SMTP_HOST, SMTP_USER, SMTP_PASSWORD). Password reset email was not dispatched.");
+    return { success: false, error: "SMTP email delivery service is not configured." };
   }
 
   const html = `
@@ -104,32 +126,40 @@ export async function sendPasswordResetEmail({
   `;
 
   try {
-    await resend.emails.send({
-      from: EMAIL_SENDER,
-      to: [to],
+    const info = await transporter.sendMail({
+      from: getSender(),
+      to,
       subject: "🔐 BrandHive Studio — Reset Your Administrative Password",
       html,
     });
+
+    if (!info || !info.messageId) {
+      console.error("❌ SMTP transmission did not return a valid messageId for password reset.");
+      return { success: false, error: "SMTP server did not acknowledge message delivery." };
+    }
+
     return { success: true };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown email error";
-    console.error("Failed to send password reset email:", message);
-    return { success: false, error: message };
+    const rawMessage = err instanceof Error ? err.message : "Unknown SMTP transmission error";
+    // Sanitize any password leakage from error message
+    const sanitized = rawMessage.replace(/pass(word)?[:=]\s*\S+/gi, "password=[REDACTED]");
+    console.error("❌ Failed to send password reset email via SMTP:", sanitized);
+    return { success: false, error: `Email delivery failed: ${sanitized}` };
   }
 }
 
 /**
- * Dispatches an email verification link to verify and activate a new administrative email address.
+ * Dispatches an email verification link to verify and activate a new administrative email address via SMTP.
  */
 export async function sendEmailVerificationEmail({
   to,
   verifyUrl,
   adminName,
 }: SendEmailVerificationParams): Promise<{ success: boolean; error?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    console.warn("⚠️ RESEND_API_KEY not configured. Verification email was not dispatched.");
-    return { success: false, error: "Email delivery service unavailable." };
+  const transporter = getSmtpTransporter();
+  if (!transporter) {
+    console.warn("⚠️ SMTP credentials not fully configured (SMTP_HOST, SMTP_USER, SMTP_PASSWORD). Verification email was not dispatched.");
+    return { success: false, error: "SMTP email delivery service is not configured." };
   }
 
   const html = `
@@ -202,16 +232,24 @@ export async function sendEmailVerificationEmail({
   `;
 
   try {
-    await resend.emails.send({
-      from: EMAIL_SENDER,
-      to: [to],
+    const info = await transporter.sendMail({
+      from: getSender(),
+      to,
       subject: "✉️ BrandHive Studio — Verify Your New Admin Email",
       html,
     });
+
+    if (!info || !info.messageId) {
+      console.error("❌ SMTP transmission did not return a valid messageId for email verification.");
+      return { success: false, error: "SMTP server did not acknowledge message delivery." };
+    }
+
     return { success: true };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown email error";
-    console.error("Failed to send email verification email:", message);
-    return { success: false, error: message };
+    const rawMessage = err instanceof Error ? err.message : "Unknown SMTP transmission error";
+    // Sanitize any password leakage from error message
+    const sanitized = rawMessage.replace(/pass(word)?[:=]\s*\S+/gi, "password=[REDACTED]");
+    console.error("❌ Failed to send email verification email via SMTP:", sanitized);
+    return { success: false, error: `Email delivery failed: ${sanitized}` };
   }
 }

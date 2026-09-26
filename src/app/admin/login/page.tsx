@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
+import { Mail, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -97,17 +98,13 @@ export default function AdminLoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <div className="relative">
-                <Lock className="size-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#16C7FF] focus:ring-1 focus:ring-[#16C7FF] transition-colors"
-                />
-              </div>
+              <PasswordInput
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                hasLeftLockIcon
+              />
             </div>
 
             <button
